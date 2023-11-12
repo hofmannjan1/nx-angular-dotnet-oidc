@@ -1,0 +1,13 @@
+{
+  "name": "nx-angular-dotnet-oidc",
+  "version": "0.0.1",
+  "license": "MIT",
+  "scripts": {},
+  "private": true,
+  "dependencies": {},
+  "devDependencies": {
+    "@nx/js": "17.1.1",
+    "@nx/workspace": "17.1.1",
+    "nx": "17.1.1"
+  }
+}
