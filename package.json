@@ -1,6 +1,6 @@
 {
   "name": "nx-angular-dotnet-oidc",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "MIT",
   "scripts": {
     "format": "prettier --write apps/shop"
@@ -13,6 +13,7 @@
     "@angular/cli": "~17.0.0",
     "@angular/compiler-cli": "~17.0.0",
     "@angular/language-service": "~17.0.0",
+    "@nx-dotnet/core": "^2.1.1",
     "@nx/angular": "^17.1.1",
     "@nx/jest": "17.1.1",
     "@nx/js": "17.1.1",
