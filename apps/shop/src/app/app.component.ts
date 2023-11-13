@@ -1,10 +1,13 @@
 import { Component } from "@angular/core";
 import { RouterModule } from "@angular/router";
+import { NgbCollapse } from "@ng-bootstrap/ng-bootstrap";
 
 @Component({
   standalone: true,
-  imports: [RouterModule],
+  imports: [RouterModule, NgbCollapse],
   selector: "shop-root",
-  template: ` <router-outlet /> `,
+  templateUrl: "./app.component.html",
 })
-export class AppComponent {}
+export class AppComponent {
+  isMenuCollapsed = true;
+}
