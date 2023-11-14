@@ -1,0 +1,52 @@
+{
+  "name": "identity-server",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/identity-server",
+  "targets": {
+    "build": {
+      "executor": "@nx-dotnet/core:build",
+      "outputs": [
+        "{workspaceRoot}/dist/apps/identity-server",
+        "{workspaceRoot}/dist/intermediates/apps/identity-server"
+      ],
+      "options": {
+        "configuration": "Debug",
+        "noDependencies": true
+      },
+      "configurations": {
+        "production": {
+          "configuration": "Release"
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nx-dotnet/core:serve",
+      "options": {
+        "configuration": "Debug"
+      },
+      "configurations": {
+        "production": {
+          "configuration": "Release"
+        }
+      }
+    },
+    "publish": {
+      "executor": "@nx-dotnet/core:publish",
+      "outputs": [
+        "{workspaceRoot}/dist/publish/apps/identity-server"
+      ],
+      "options": {
+        "output": "dist/publish/apps/identity-server",
+        "configuration": "Release",
+        "selfContained": true,
+        "runtime": "linux-x64",
+        "noDependencies": true
+      }
+    },
+    "format": {
+      "executor": "@nx-dotnet/core:format"
+    }
+  },
+  "tags": []
+}

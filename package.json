@@ -1,9 +1,10 @@
 {
   "name": "nx-angular-dotnet-oidc",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "license": "MIT",
   "scripts": {
-    "format": "prettier --write apps/shop"
+    "format": "prettier --write apps/shop",
+    "prepare": "nx g @nx-dotnet/core:restore"
   },
   "private": true,
   "devDependencies": {

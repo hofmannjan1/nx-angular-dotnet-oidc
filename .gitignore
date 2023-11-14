@@ -2,6 +2,6 @@
 .idea
 .nx
 .vscode
-/dist
+**/dist
 node_modules
 CHANGELOG

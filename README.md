@@ -1,5 +1,18 @@
+
 # Nx full-stack Angular + .NET workspace with OIDC
 
 ## Quick Start
 
-Run `npx nx serve shop` to start the Angular shop application. Navigate to http://localhost:5201/.
+Angular Shop application
+
+- Run `npx nx serve shop` to start the Angular Shop application. Navigate to http://localhost:5201/.
+
+Identity Server application
+
+- Run `npx nx serve identity-server` to start the Identity Server application. Navigate to https://localhost:7001/.
+- Run `npx nx build identity-server` to build the Identity Server application.
+- Run `npx nx publish identity-server` to publish the Identity Server application into the `dist/publish/apps/identity-server` folder. The executable can also be run on the local machine using `./IdentityServer`.
+
+All applications
+
+- Run `npx nx run-many --target=serve --projects=*` to start all applications at once.
