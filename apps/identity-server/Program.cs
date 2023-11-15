@@ -94,7 +94,19 @@ if (app.Environment.IsDevelopment())
   });
 }
 
+// Configure CORS
+// See https://learn.microsoft.com/en-us/aspnet/core/security/cors
+var allowedHosts = builder.Configuration["AllowedCorsOrigins"]!.Split(";");
+app.UseCors(policyBuilder => policyBuilder
+  .AllowAnyHeader()
+  .AllowAnyMethod()
+  .WithOrigins(allowedHosts));
+
 app.UseRouting();
+
+// Enforce HTTPS
+// SEE https://learn.microsoft.com/en-us/aspnet/core/security/enforcing-ssl
+app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
