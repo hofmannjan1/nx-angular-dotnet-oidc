@@ -66,6 +66,32 @@ builder.Services
     // Enable Quartz.NET integration.
     options.UseQuartz();
   })
+  // Register the OpenIddict server components.
+  // OpenIddict will automatically provide an endpoint /.well-known/openid-configuration
+  .AddServer(options =>
+  {
+    // Register `profile` and `email` as supported scopes.
+    options.RegisterScopes(Scopes.Profile, Scopes.Email);
+
+    options
+      // Enable the authorization endpoint for the authorization code flow.
+      .SetAuthorizationEndpointUris("connect/authorize")
+      // Enable the token endpoint.
+      .SetTokenEndpointUris("connect/token");
+
+    // Enable authorization code flow with refresh tokens.
+    options
+      .AllowAuthorizationCodeFlow()
+      .AllowRefreshTokenFlow();
+
+    // Register the signing and encryption credentials.
+    options
+      .AddDevelopmentEncryptionCertificate()
+      .AddDevelopmentSigningCertificate();
+
+    // Register the .NET host.
+    options.UseAspNetCore();
+  })
   // Register the OpenIddict validation components.
   .AddValidation(options =>
   {
