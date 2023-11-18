@@ -47,7 +47,7 @@ public class TokenController : OpenIdController
       return Forbid(new AuthenticationProperties(new Dictionary<string, string?>
         {
           [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.InvalidGrant,
-          [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] = "The token is not valid."
+          [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] = "Could not find the user."
         }),
         OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
 

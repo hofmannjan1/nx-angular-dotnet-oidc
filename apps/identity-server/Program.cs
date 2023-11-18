@@ -95,7 +95,9 @@ builder.Services
       // Allow the custom controller action to handle authorization requests.
       .EnableAuthorizationEndpointPassthrough()
       // Allow the custom controller action to handle token requests.
-      .EnableTokenEndpointPassthrough();
+      .EnableTokenEndpointPassthrough()
+      // Allow the custom controller action to handle userinfo requests.
+      .EnableUserinfoEndpointPassthrough();
   })
   // Register the OpenIddict validation components.
   .AddValidation(options =>
