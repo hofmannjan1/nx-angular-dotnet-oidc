@@ -90,7 +90,10 @@ builder.Services
       .AddDevelopmentSigningCertificate();
 
     // Register the .NET host.
-    options.UseAspNetCore();
+    options
+      .UseAspNetCore()
+      // Allow the custom controller action to handle authorization requests.
+      .EnableAuthorizationEndpointPassthrough();
   })
   // Register the OpenIddict validation components.
   .AddValidation(options =>
