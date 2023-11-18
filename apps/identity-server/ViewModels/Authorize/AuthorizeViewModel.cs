@@ -10,3 +10,4 @@ public class AuthorizeViewModel
   [Display(Name = "Scope")]
   public string Scope { get; set; }
 }
+

@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Abstractions;
+using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.Extensions.Primitives;
 using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Abstractions;
@@ -14,7 +16,7 @@ using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace IdentityServer.Controllers;
 
-public class AuthorizeController : Controller
+public class AuthorizeController : OpenIdController
 {
   private readonly IOpenIddictApplicationManager _applicationManager;
   private readonly IOpenIddictAuthorizationManager _authorizationManager;
@@ -48,30 +50,30 @@ public class AuthorizeController : Controller
       return await LoginChallengeResultAsync();
 
     // Retrieve the claims principal.
-    var result = await HttpContext.AuthenticateAsync() ??
-      throw new InvalidOperationException("Could not retrieve the claims principal.");
+    var result = await HttpContext.AuthenticateAsync()
+      ?? throw new InvalidOperationException("Could not retrieve the claims principal.");
 
-    if (!result.Succeeded || request.MaxAge.HasValue && result.Properties.IssuedUtc.HasValue 
+    if (!result.Succeeded || request.MaxAge.HasValue && result.Properties.IssuedUtc.HasValue
       && DateTimeOffset.UtcNow - result.Properties.IssuedUtc.Value > TimeSpan.FromSeconds(request.MaxAge.Value))
     {
-    // Return an error if the client requested promptless authentication.
-    if (request.HasPrompt(Prompts.None))
-      return Forbid(new AuthenticationProperties(new Dictionary<string, string?>
-        {
-          [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.LoginRequired,
-          [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] = "Could not log in the user."
-        }),
-        OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+      // Return an error if the client requested promptless authentication.
+      if (request.HasPrompt(Prompts.None))
+        return Forbid(new AuthenticationProperties(new Dictionary<string, string?>
+          {
+            [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.LoginRequired,
+            [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] = "Could not log in the user."
+          }),
+          OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
 
       return await LoginChallengeResultAsync();
     }
 
     // Retrieve the profile of the logged in user.
-    var user = await _userManager.GetUserAsync(result.Principal) 
+    var user = await _userManager.GetUserAsync(result.Principal)
       ?? throw new InvalidOperationException("Could not retrieve the user details.");
 
     // Retrieve the application details from the database.
-    var application = await _applicationManager.FindByClientIdAsync(request.ClientId) 
+    var application = await _applicationManager.FindByClientIdAsync(request.ClientId)
       ?? throw new InvalidOperationException("Could not retrieve the client application details.");
 
     // Retrieve the permanent authorizations for the user, client and scopes.
@@ -82,7 +84,7 @@ public class AuthorizeController : Controller
       AuthorizationTypes.Permanent,
       request.GetScopes()).ToListAsync();
 
-    // For now, require explict user consent.
+    // For now, require explicit user consent.
     if (!await _applicationManager.HasConsentTypeAsync(application, ConsentTypes.Explicit))
       return Forbid(
         new AuthenticationProperties(new Dictionary<string, string?>
@@ -94,7 +96,7 @@ public class AuthorizeController : Controller
 
     // Return an authorization response without displaying the consent form.
     // This would also apply for implicit consent.
-    if(authorizations.Any() && !request.HasPrompt(Prompts.Consent)) 
+    if(authorizations.Any() && !request.HasPrompt(Prompts.Consent))
     {
       return await AuthorizationResultAsync();
     }
@@ -126,10 +128,10 @@ public class AuthorizeController : Controller
       ?? throw new InvalidOperationException("Could not retrieve the request.");
 
     // Retrieve the application details from the database.
-    var application = await _applicationManager.FindByClientIdAsync(request.ClientId) 
+    var application = await _applicationManager.FindByClientIdAsync(request.ClientId)
       ?? throw new InvalidOperationException("Could not retrieve the client application details.");
 
-    // For now, require explict user consent.
+    // For now, require explicit user consent.
     if (!await _applicationManager.HasConsentTypeAsync(application, ConsentTypes.Explicit))
       return Forbid(new AuthenticationProperties(new Dictionary<string, string?>
         {
@@ -149,16 +151,19 @@ public class AuthorizeController : Controller
   [ValidateAntiForgeryToken]
   public IActionResult Deny() => Forbid(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
 
+  /// <summary>
+  /// Enforce login.
+  /// </summary>
   private async Task<ChallengeResult> LoginChallengeResultAsync()
   {
     // Retrieve the OpenID Connect request.
-    var request = HttpContext.GetOpenIddictServerRequest() 
-      ?? throw new InvalidOperationException("The request could not be retrieved.");
+    var request = HttpContext.GetOpenIddictServerRequest()
+      ?? throw new InvalidOperationException("Could not retrieve the request.");
 
     // Remove the login prompt flag to avoid endless redirects.
     var prompt = string.Join(" ", request.GetPrompts().Remove(Prompts.Login));
 
-    var parameters = Request.HasFormContentType 
+    var parameters = Request.HasFormContentType
       ? Request.Form.Where(parameter => parameter.Key != Parameters.Prompt).ToList()
       : Request.Query.Where(parameter => parameter.Key != Parameters.Prompt).ToList();
 
@@ -170,29 +175,24 @@ public class AuthorizeController : Controller
     });
   }
 
-  private async Task<Microsoft.AspNetCore.Mvc.SignInResult> AuthorizationResultAsync() 
+  /// <summary>
+  /// Return authorization result.
+  /// </summary>
+  private async Task<Microsoft.AspNetCore.Mvc.SignInResult> AuthorizationResultAsync()
   {
     // Retrieve the OpenID Connect request.
     var request = HttpContext.GetOpenIddictServerRequest()
       ?? throw new InvalidOperationException("Could not retrieve the request.");
 
     // Retrieve the profile of the logged in user.
-    var user = await _userManager.GetUserAsync(User) 
+    var user = await _userManager.GetUserAsync(User)
       ?? throw new InvalidOperationException("Could not retrieve the user details.");
 
     // Retrieve the application details from the database.
-    var application = await _applicationManager.FindByClientIdAsync(request.ClientId) 
+    var application = await _applicationManager.FindByClientIdAsync(request.ClientId)
       ?? throw new InvalidOperationException("Could not retrieve the client application details.");
 
-    // Retrieve the permanent authorizations for the user, client and scopes.
-    var authorizations = await _authorizationManager.FindAsync(
-      await _userManager.GetUserIdAsync(user),
-      await _applicationManager.GetIdAsync(application),
-      Statuses.Valid,
-      AuthorizationTypes.Permanent,
-      request.GetScopes()).ToListAsync();
-
-    // Create the claim-based identity for grnerating the token.
+    // Create the claim-based identity for generating the token.
     var identity = new ClaimsIdentity(
       TokenValidationParameters.DefaultAuthenticationType,
       Claims.Name,
@@ -208,8 +208,17 @@ public class AuthorizeController : Controller
     identity.SetScopes(request.GetScopes());
     identity.SetResources(await _scopeManager.ListResourcesAsync(identity.GetScopes()).ToListAsync());
 
-    // Create a permanent authorization that will not require explicit consent for future authorization requests with the same scopes.
+    // Retrieve the permanent authorizations for the user and client application. Otherwise, create a permanent
+    // authorization that will not require explicit consent for future authorization requests with the same scopes.
+    var authorizations = await _authorizationManager.FindAsync(
+      await _userManager.GetUserIdAsync(user),
+      await _applicationManager.GetIdAsync(application),
+      Statuses.Valid,
+      AuthorizationTypes.Permanent,
+      request.GetScopes()).ToListAsync();
+
     var authorization = authorizations.LastOrDefault();
+
     authorization ??= await _authorizationManager.CreateAsync(
       identity,
       await _userManager.GetUserIdAsync(user),
@@ -218,25 +227,25 @@ public class AuthorizeController : Controller
       identity.GetScopes());
 
     identity.SetAuthorizationId(await _authorizationManager.GetIdAsync(authorization));
+
+    // Set destinations (access token, identity token or both) for the claims.
     identity.SetDestinations(ClaimsDestinationSelector);
 
     // Return authorization result.
     return SignIn(new ClaimsPrincipal(identity), OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
   }
+}
 
-  /// <summary>
-  /// Determine whether the specified claim is included in the access token, the identity token or in both.
-  /// </summary>
-  private static readonly Func<Claim, IEnumerable<string>> ClaimsDestinationSelector = claim => claim switch
-  {
-    { Type: Claims.Name } => claim.Subject!.HasScope(Scopes.Profile)
-      ? new [] { Destinations.AccessToken,  Destinations.IdentityToken }
-      : new [] { Destinations.AccessToken },
+public sealed class FormValueRequiredAttribute : ActionMethodSelectorAttribute
+{
+  private readonly string _name;
 
-    { Type: Claims.Email } => claim.Subject!.HasScope(Scopes.Email)
-      ? new [] { Destinations.AccessToken,  Destinations.IdentityToken }
-      : new [] { Destinations.AccessToken },
+  public FormValueRequiredAttribute(string name)
+    => _name = name;
 
-    _ => new [] { Destinations.AccessToken }
-  };
+  public override bool IsValidForRequest(RouteContext context, ActionDescriptor action)
+    => string.Equals(context.HttpContext.Request.Method, "POST", StringComparison.OrdinalIgnoreCase)
+      && !string.IsNullOrEmpty(context.HttpContext.Request.ContentType)
+      && context.HttpContext.Request.ContentType.StartsWith("application/x-www-form-urlencoded", StringComparison.OrdinalIgnoreCase)
+      && !string.IsNullOrEmpty(context.HttpContext.Request.Form[_name]);
 }

@@ -93,7 +93,9 @@ builder.Services
     options
       .UseAspNetCore()
       // Allow the custom controller action to handle authorization requests.
-      .EnableAuthorizationEndpointPassthrough();
+      .EnableAuthorizationEndpointPassthrough()
+      // Allow the custom controller action to handle token requests.
+      .EnableTokenEndpointPassthrough();
   })
   // Register the OpenIddict validation components.
   .AddValidation(options =>
