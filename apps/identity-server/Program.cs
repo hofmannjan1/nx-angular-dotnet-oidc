@@ -77,7 +77,11 @@ builder.Services
       // Enable the authorization endpoint for the authorization code flow.
       .SetAuthorizationEndpointUris("connect/authorize")
       // Enable the token endpoint.
-      .SetTokenEndpointUris("connect/token");
+      .SetTokenEndpointUris("connect/token")
+      // Enable the userinfo endpoint.
+      .SetUserinfoEndpointUris("connect/userinfo")
+      // Enable the logout endpoint.
+      .SetLogoutEndpointUris("connect/logout");
 
     // Enable authorization code flow with refresh tokens.
     options
@@ -97,7 +101,9 @@ builder.Services
       // Allow the custom controller action to handle token requests.
       .EnableTokenEndpointPassthrough()
       // Allow the custom controller action to handle userinfo requests.
-      .EnableUserinfoEndpointPassthrough();
+      .EnableUserinfoEndpointPassthrough()
+      // Allow the custom controller action to handle logout requests.
+      .EnableLogoutEndpointPassthrough();
   })
   // Register the OpenIddict validation components.
   .AddValidation(options =>

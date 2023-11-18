@@ -25,11 +25,20 @@ export class AppComponent {
   );
   userData$ = this.oidcSecurityService.userData$;
 
+  ngOnInit() {
+    // Start the authentication flow.
+    this.oidcSecurityService
+      .checkAuth()
+      .subscribe(({ isAuthenticated, userData}) => console.log(isAuthenticated, userData));
+  }
+
   login(): void {
     this.oidcSecurityService.authorize();
   }
 
   logout(): void {
-    this.oidcSecurityService.logoff();
+    this.oidcSecurityService
+      .logoff()
+      .subscribe((result) => console.log(result));
   }
 }
