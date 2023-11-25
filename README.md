@@ -7,6 +7,10 @@ Angular Shop application
 
 - Run `npx nx serve shop` to start the Angular Shop application. Navigate to http://localhost:5201/.
 
+Shop API
+
+- Run `npx nx serve shop-api` to start the Shop Web API. Navigate to https://localhost:7101/.
+
 Identity Server application
 
 - Run `npx nx serve identity-server` to start the Identity Server application. Navigate to https://localhost:7001/.

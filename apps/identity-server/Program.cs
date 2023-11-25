@@ -28,7 +28,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
   options.UseOpenIddict();
 });
 
-// Use the OpenIddict integration with Quartz.NET to perform scheduled tasks.
+// Use the OpenIddict integration with Quartz.NET to perform scheduled tasks e.g. seeding the database.
 // This requires the `Quartz.Extensions.DependencyInjection` package to be installed.
 builder.Services.AddQuartz(options =>
 {
@@ -80,6 +80,9 @@ builder.Services
       .SetTokenEndpointUris("connect/token")
       // Enable the userinfo endpoint.
       .SetUserinfoEndpointUris("connect/userinfo")
+      // Enable the introspection endpoint.
+      // See https://www.oauth.com/oauth2-servers/token-introspection-endpoint
+      .SetIntrospectionEndpointUris("connect/introspection")
       // Enable the logout endpoint.
       .SetLogoutEndpointUris("connect/logout");
 

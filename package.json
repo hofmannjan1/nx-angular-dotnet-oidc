@@ -1,6 +1,6 @@
 {
   "name": "nx-angular-dotnet-oidc",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "license": "MIT",
   "scripts": {
     "format": "prettier --write apps/shop",

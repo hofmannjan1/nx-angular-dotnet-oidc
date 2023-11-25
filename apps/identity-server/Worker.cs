@@ -15,10 +15,11 @@ public class Worker : IHostedService
   {
     await using var scope = _serviceProvider.CreateAsyncScope();
 
-    // Ensure that the database for the context exists
+    // Ensure that the database for the context exists.
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await context.Database.EnsureCreatedAsync(cancellationToken);
 
+    // Seed the database.
     await RegisterApplicationsAsync(scope.ServiceProvider);
   }
 
@@ -69,6 +70,20 @@ public class Worker : IHostedService
           // The application is required to use PKCE.
           // See https://documentation.openiddict.com/configuration/proof-key-for-code-exchange.html
           Requirements.Features.ProofKeyForCodeExchange
+        }
+      });
+    }
+
+    if (await applicationManager.FindByClientIdAsync("shop-api") is null)
+    {
+      await applicationManager.CreateAsync(new OpenIddictApplicationDescriptor
+      {
+        ClientId = "shop-api",
+        ClientSecret = "E3AE9B04-A744-49A2-8460-C027F8FDF343",
+        Permissions =
+        {
+          // The resource server is permitted to use the introspection endpoint to validate tokens.
+          Permissions.Endpoints.Introspection
         }
       });
     }
