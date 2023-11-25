@@ -119,12 +119,17 @@ builder.Services.AddCors();
 
 var app = builder.Build();
 
-// Use static files from wwwroot
-app.UseStaticFiles();
-// Use static files from ../../node_modules/bootstrap
-// For `build` and `publish` these files are copied to wwwroot
 if (app.Environment.IsDevelopment())
 {
+  app.UseDeveloperExceptionPage();
+}
+
+// Use static files from wwwroot
+app.UseStaticFiles();
+if (app.Environment.IsDevelopment())
+{
+  // For development, use static files from ../../node_modules/bootstrap
+  // These files are copied to wwwroot on `build` or `publish`
   app.UseStaticFiles(new StaticFileOptions
   {
     FileProvider = new PhysicalFileProvider(
