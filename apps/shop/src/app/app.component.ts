@@ -1,17 +1,13 @@
-import { AsyncPipe } from '@angular/common';
+import { AsyncPipe } from "@angular/common";
 import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
 import { RouterModule } from "@angular/router";
 import { NgbCollapse } from "@ng-bootstrap/ng-bootstrap";
-import { OidcSecurityService } from 'angular-auth-oidc-client';
-import { map } from 'rxjs';
+import { OidcSecurityService } from "angular-auth-oidc-client";
+import { map } from "rxjs";
 
 @Component({
   standalone: true,
-  imports: [
-    RouterModule,
-    AsyncPipe,
-    NgbCollapse
-  ],
+  imports: [RouterModule, AsyncPipe, NgbCollapse],
   selector: "shop-root",
   templateUrl: "./app.component.html",
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -21,7 +17,7 @@ export class AppComponent {
 
   isMenuCollapsed = true;
   isUserAuthenticated$ = this.oidcSecurityService.isAuthenticated$.pipe(
-    map(x => x.isAuthenticated)
+    map((x) => x.isAuthenticated)
   );
   userData$ = this.oidcSecurityService.userData$;
 
@@ -29,7 +25,7 @@ export class AppComponent {
     // Start the authentication flow.
     this.oidcSecurityService
       .checkAuth()
-      .subscribe(({ isAuthenticated, userData}) => console.log(isAuthenticated, userData));
+      .subscribe(({ isAuthenticated, userData }) => console.log(isAuthenticated, userData));
   }
 
   login(): void {
@@ -37,8 +33,6 @@ export class AppComponent {
   }
 
   logout(): void {
-    this.oidcSecurityService
-      .logoff()
-      .subscribe((result) => console.log(result));
+    this.oidcSecurityService.logoff().subscribe((result) => console.log(result));
   }
 }

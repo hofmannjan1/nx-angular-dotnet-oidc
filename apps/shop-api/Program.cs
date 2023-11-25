@@ -79,12 +79,22 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-  // Enable the middleware for serving the Swagger generated JSON document and Swagger UI
+  // Enable the middleware for serving the Swagger generated JSON document and Swagger UI.
   // See https://aka.ms/aspnetcore/swashbuckle
   app.UseSwagger();
   app.UseSwaggerUI();
 }
 
+// Configure CORS.
+// See https://learn.microsoft.com/en-us/aspnet/core/security/cors
+var allowedHosts = builder.Configuration["AllowedCorsOrigins"]!.Split(";");
+app.UseCors(policyBuilder => policyBuilder
+  .AllowAnyHeader()
+  .AllowAnyMethod()
+  .WithOrigins(allowedHosts));
+
+// Enforce HTTPS.
+// See https://learn.microsoft.com/en-us/aspnet/core/security/enforcing-ssl
 app.UseHttpsRedirection();
 
 app.UseAuthentication();

@@ -32,35 +32,35 @@
             </a>
           </li>
           @if (isUserAuthenticated$ | async) {
-            <li class="nav-item">
-              <a
-                class="nav-link text-dark"
-                [routerLink]="['/orders']">
-                Orders
-              </a>
-            </li>
+          <li class="nav-item">
+            <a
+              class="nav-link text-dark"
+              [routerLink]="['/orders']">
+              Orders
+            </a>
+          </li>
           }
         </ul>
 
         <ul class="navbar-nav align-items-center">
           @if (isUserAuthenticated$ | async) {
-            <li class="nav-item">
-              <button
-                class="btn btn-dark btn-sm"
-                title="Logout"
-                (click)="logout()">
-                Logout
-              </button>
-            </li>
+          <li class="nav-item">
+            <button
+              class="btn btn-dark btn-sm"
+              title="Logout"
+              (click)="logout()">
+              Logout
+            </button>
+          </li>
           } @else {
-            <li class="nav-item ">
-              <button
-                class="btn btn-dark btn-sm"
-                title="Login"
-                (click)="login()">
-                Login
-              </button>
-            </li>
+          <li class="nav-item">
+            <button
+              class="btn btn-dark btn-sm"
+              title="Login"
+              (click)="login()">
+              Login
+            </button>
+          </li>
           }
         </ul>
       </div>

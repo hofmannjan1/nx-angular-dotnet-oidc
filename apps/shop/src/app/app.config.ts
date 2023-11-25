@@ -1,8 +1,8 @@
 import { ApplicationConfig } from "@angular/core";
 import { provideRouter } from "@angular/router";
 import { appRoutes } from "./app.routes";
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { authInterceptor, provideAuth } from 'angular-auth-oidc-client';
+import { provideHttpClient, withInterceptors } from "@angular/common/http";
+import { authInterceptor, provideAuth } from "angular-auth-oidc-client";
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -10,26 +10,26 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([authInterceptor()])),
     provideAuth({
       config: {
-        postLoginRoute: '/orders',
+        postLoginRoute: "/orders",
         // TODO forbiddenRoute: '',
         // TODO unauthorizedRoute: '',
         // Redirect urls for the identity server
         redirectUrl: window.location.origin,
         postLogoutRedirectUri: window.location.origin,
         // Url of the identity server
-        authority: 'https://localhost:7001',
+        authority: "https://localhost:7001",
         // Id of the client application
-        clientId: 'shop',
+        clientId: "shop",
         // Scopes requested by the client
-        scope: 'openid profile email',
+        scope: "openid profile email",
         // Use authorization code flow + PKCE
-        responseType: 'code',
+        responseType: "code",
         // Renew client tokens when expired using the refresh token
         silentRenew: true,
         useRefreshToken: true,
         // Urls where the authInterceptor adds the access token to the request
-        secureRoutes: []
-      }
-    })
+        secureRoutes: ["https://localhost:7101"],
+      },
+    }),
   ],
 };
