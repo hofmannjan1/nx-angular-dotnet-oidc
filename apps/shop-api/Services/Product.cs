@@ -1,4 +1,4 @@
-namespace ShopApi;
+namespace ShopApi.Services;
 
 public class Product
 {

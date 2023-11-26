@@ -2,10 +2,37 @@ using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 using OpenIddict.Validation.AspNetCore;
 using OpenIddict.Validation.SystemNetHttp;
+using Quartz;
+using ShopApi;
+using ShopApi.Data;
+using ShopApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services
+  .AddControllers()
+  .ConfigureApiBehaviorOptions(options =>
+  {
+    // Do not infer the binding source for controller action parameters. This allows to extract the
+    // parameters into their own class and have different binding sources for each property.
+    options.SuppressInferBindingSourcesForParameters = true;
+  });
+
+builder.Services.AddSingleton<AppDbContext>();
+
+// Use Quartz.NET to perform scheduled tasks e.g. seeding the database.
+// This requires the `Quartz.Extensions.DependencyInjection` package to be installed.
+builder.Services.AddQuartz(options =>
+{
+  options.UseInMemoryStore();
+});
+
+// Register the Quartz.NET service and configure it to block shutdown until jobs are complete.
+// This requires the `Quartz.Extensions.Hosting` package to be installed.
+builder.Services.AddQuartzHostedService(options => options.WaitForJobsToComplete = true);
+
+// Register Quartz.NET worker.
+builder.Services.AddHostedService<Worker>();
 
 // Add the Swagger generator to the services collection.
 // See https://aka.ms/aspnetcore/swashbuckle
@@ -74,6 +101,8 @@ builder.Services
 
 builder.Services.AddAuthentication(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
 builder.Services.AddAuthorization();
+
+builder.Services.AddScoped<ICartService, CartService>();
 
 var app = builder.Build();
 
