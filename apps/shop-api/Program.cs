@@ -103,6 +103,7 @@ builder.Services.AddAuthentication(OpenIddictValidationAspNetCoreDefaults.Authen
 builder.Services.AddAuthorization();
 
 builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<IProductService, ProductService>();
 
 var app = builder.Build();
 

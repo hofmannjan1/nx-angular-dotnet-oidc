@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
 import { RouterModule } from "@angular/router";
 import { NgbCollapse } from "@ng-bootstrap/ng-bootstrap";
 import { OidcSecurityService } from "angular-auth-oidc-client";
-import { map } from "rxjs";
+import { map, tap } from "rxjs";
 import { AppStore } from "./app.store";
 
 @Component({
@@ -19,7 +19,8 @@ export class AppComponent {
 
   isMenuCollapsed = true;
   isUserAuthenticated$ = this.oidcSecurityService.isAuthenticated$.pipe(
-    map((x) => x.isAuthenticated)
+    map((x) => x.isAuthenticated),
+    tap((x) => (x ? this.appStore.loadCartPositions() : {}))
   );
   userData$ = this.oidcSecurityService.userData$;
 
@@ -32,7 +33,6 @@ export class AppComponent {
       .subscribe(({ isAuthenticated, userData }) => console.log(isAuthenticated, userData));
 
     this.appStore.loadProducts();
-    this.appStore.loadCartPositions();
   }
 
   login(): void {
