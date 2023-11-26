@@ -41,7 +41,7 @@ public class CartController : ControllerBase
     var userId = User.GetClaim(Claims.Subject)
       ?? throw new InvalidOperationException("Could not determine the user.");
 
-    var id = await _cartService.CreateCartPositionAsync(userId, request.Position.ProductId,
+    var id = await _cartService.UpsertCartPositionAsync(userId, request.Position.ProductId,
       request.Position.Quantity, request.CancellationToken);
 
     return CreatedAtAction("GetCartPositions", new { id });

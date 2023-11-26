@@ -12,7 +12,7 @@
       <div class="row g-0">
         <div class="col-4">
           <img
-            src="https://placehold.co/200x300?text={{ product.key }}"
+            src="https://placehold.co/200x300?text={{ product.value.id }}"
             class="img-fluid rounded-start" />
         </div>
         <div class="col-8">
@@ -23,6 +23,13 @@
                 product.value.price | currency : "EUR"
               }}</small>
             </p>
+            @if (isUserAuthenticated$ | async) {
+            <button
+              class="btn btn-primary"
+              (click)="addProductToCart(product.value.id)">
+              Add to cart
+            </button>
+            }
           </div>
         </div>
       </div>

@@ -4,7 +4,7 @@
     <div class="container">
       <a
         class="navbar-brand"
-        href="/">
+        [routerLink]="['/']">
         Angular Shop
       </a>
       <button
@@ -24,14 +24,14 @@
               Products
             </a>
           </li>
+          @if (isUserAuthenticated$ | async) {
           <li class="nav-item">
             <a
               class="nav-link text-dark"
               [routerLink]="['/cart']">
-              Cart
+              Cart <span class="badge text-bg-secondary">{{ cartPositionCount() }}</span>
             </a>
           </li>
-          @if (isUserAuthenticated$ | async) {
           <li class="nav-item">
             <a
               class="nav-link text-dark"

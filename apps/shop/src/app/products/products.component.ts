@@ -1,6 +1,8 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject } from "@angular/core";
+import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
 import { AsyncPipe, CommonModule, CurrencyPipe } from "@angular/common";
 import { AppStore } from "../app.store";
+import { OidcSecurityService } from "angular-auth-oidc-client";
+import { map } from "rxjs";
 
 @Component({
   selector: "shop-products",
@@ -9,14 +11,18 @@ import { AppStore } from "../app.store";
   templateUrl: "products.component.html",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProductsComponent implements OnInit {
+export class ProductsComponent {
   private appStore = inject(AppStore);
+  private oidcSecurityService = inject(OidcSecurityService);
+
+  isUserAuthenticated$ = this.oidcSecurityService.isAuthenticated$.pipe(
+    map((x) => x.isAuthenticated)
+  );
 
   products = this.appStore.products;
   productsLoading = this.appStore.productsLoading;
 
-  ngOnInit(): void {
-    // Load products into signal store.
-    this.appStore.loadProducts();
+  addProductToCart(productId: number) {
+    this.appStore.addProductToCart(productId);
   }
 }

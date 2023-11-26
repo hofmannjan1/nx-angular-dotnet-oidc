@@ -17,6 +17,7 @@ export const appRoutes: Route[] = [
   {
     path: "cart",
     component: CartComponent,
+    canActivate: [autoLoginPartialRoutesGuard],
   },
   {
     path: "orders",

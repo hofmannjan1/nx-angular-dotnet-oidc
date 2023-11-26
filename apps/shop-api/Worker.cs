@@ -37,7 +37,9 @@ public class Worker : IHostedService
         Id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
         UserId TEXT,
         ProductId INTEGER,
-        Quantity INTEGER
+        Quantity INTEGER,
+        -- Add UNIQUE constraint to allow upserting with the `ON CONFLICT` clause.
+        UNIQUE(UserId, ProductId)
       )";
 
     await dbConnection.ExecuteAsync(sql);
