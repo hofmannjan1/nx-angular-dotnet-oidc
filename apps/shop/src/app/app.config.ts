@@ -1,8 +1,8 @@
 import { ApplicationConfig } from "@angular/core";
 import { provideRouter } from "@angular/router";
-import { appRoutes } from "./app.routes";
 import { provideHttpClient, withInterceptors } from "@angular/common/http";
 import { authInterceptor, provideAuth } from "angular-auth-oidc-client";
+import { appRoutes } from "./app.routes";
 
 export const appConfig: ApplicationConfig = {
   providers: [

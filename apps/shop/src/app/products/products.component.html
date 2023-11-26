@@ -1,0 +1,33 @@
+<h1 class="mb-3">Products</h1>
+@if (productsLoading()) {
+<div class="spinner-border">
+  <span class="visually-hidden">Loading...</span>
+</div>
+} @else {
+<div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
+  <!-- Use the KeyValuePipe to iterate the product record -->
+  @for (product of products() | keyvalue; track product.key) {
+  <div class="col">
+    <div class="card">
+      <div class="row g-0">
+        <div class="col-4">
+          <img
+            src="https://placehold.co/200x300?text={{ product.key }}"
+            class="img-fluid rounded-start" />
+        </div>
+        <div class="col-8">
+          <div class="card-body">
+            <h5 class="card-title">{{ product.value.name }}</h5>
+            <p class="card-text">
+              <small class="text-body-secondary">{{
+                product.value.price | currency : "EUR"
+              }}</small>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+</div>
+}

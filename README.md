@@ -1,4 +1,3 @@
-
 # Nx full-stack Angular + .NET workspace with OIDC
 
 ## Quick Start
@@ -19,4 +18,4 @@ Identity Server application
 
 All applications
 
-- Run `npx nx run-many --target=serve --projects=*` to start all applications at once.
+- Run `npx nx run-many --target=serve --all` to start all applications at once.
