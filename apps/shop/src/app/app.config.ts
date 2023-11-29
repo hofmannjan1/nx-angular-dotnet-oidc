@@ -10,6 +10,7 @@ import { provideRouter } from "@angular/router";
 import { provideHttpClient, withInterceptors } from "@angular/common/http";
 import { authInterceptor, provideAuth } from "angular-auth-oidc-client";
 import { appRoutes } from "./app.routes";
+import { environment } from "../environments/environment";
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -24,18 +25,18 @@ export const appConfig: ApplicationConfig = {
         redirectUrl: window.location.origin,
         postLogoutRedirectUri: window.location.origin,
         // Url of the identity server
-        authority: "https://localhost:7001",
+        authority: environment.auth.authorityUrl,
         // Id of the client application
-        clientId: "shop",
+        clientId: environment.auth.clientId,
         // Scopes requested by the client
-        scope: "openid profile email",
+        scope: environment.auth.scopes,
         // Use authorization code flow + PKCE
         responseType: "code",
         // Renew client tokens when expired using the refresh token
         silentRenew: true,
         useRefreshToken: true,
         // Urls where the authInterceptor adds the access token to the request
-        secureRoutes: ["https://localhost:7101"],
+        secureRoutes: [environment.shopApiUrl],
       },
     }),
   ],

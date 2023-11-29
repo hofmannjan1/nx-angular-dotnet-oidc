@@ -1,21 +1,23 @@
+/**
+ * ABOUT THIS FILE
+ *
+ * This file includes the service that communicates with the shop API's CartController via HTTP.
+ */
 import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
 import { firstValueFrom } from "rxjs";
 import { CartPosition } from "../models";
+import { environment } from "../../../environments/environment";
 
 @Injectable({ providedIn: "root" })
 export class CartService {
   private httpClient = inject(HttpClient);
 
-  async getCartPositions(): Promise<CartPosition[]> {
-    return await firstValueFrom(
-      this.httpClient.get<CartPosition[]>("https://localhost:7101/cart/positions")
-    );
-  }
+  getCartPositions = (): Promise<CartPosition[]> =>
+    firstValueFrom(this.httpClient.get<CartPosition[]>(`${environment.shopApiUrl}/cart/positions`));
 
-  async addProductToCart(productId: number, quantity?: number): Promise<void> {
-    await firstValueFrom(
-      this.httpClient.post("https://localhost:7101/cart/positions", { productId, quantity })
+  addProductToCart = (productId: number, quantity?: number): Promise<any> =>
+    firstValueFrom(
+      this.httpClient.post(`${environment.shopApiUrl}/cart/positions`, { productId, quantity })
     );
-  }
 }
