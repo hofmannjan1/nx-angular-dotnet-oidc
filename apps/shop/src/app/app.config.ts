@@ -1,3 +1,10 @@
+/**
+ * ABOUT THIS FILE
+ *
+ * This files includes the initial application configuration. This is a lightweight alternative to
+ * the app.module.ts file which would be used for an Angular application without standalone
+ * components.
+ */
 import { ApplicationConfig } from "@angular/core";
 import { provideRouter } from "@angular/router";
 import { provideHttpClient, withInterceptors } from "@angular/common/http";

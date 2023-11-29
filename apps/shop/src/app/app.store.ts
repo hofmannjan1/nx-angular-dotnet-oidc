@@ -1,3 +1,10 @@
+/**
+ * ABOUT THIS FILE
+ *
+ * This files includes the state and state management using @ngrx/signals store. This is a
+ * lightweight alternative to the @ngrx/store Redux store. The computed signals correspond
+ * to Redux selectors, the methods correspond to Redux reducers and effects.
+ */
 import { patchState, signalStore, withComputed, withMethods, withState } from "@ngrx/signals";
 import { computed, inject } from "@angular/core";
 import { CartPosition, Product } from "./core/models";
