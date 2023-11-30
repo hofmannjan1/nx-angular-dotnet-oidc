@@ -10,14 +10,11 @@ public class ProductsController : ControllerBase
   private readonly IProductService _productService;
 
   public ProductsController(IProductService productService)
-  {
-    _productService = productService;
-  }
+    => _productService = productService;
 
   [HttpGet("")]
   [ProducesResponseType(StatusCodes.Status200OK)]
   [Produces("application/json")]
-  public async Task<ActionResult<IEnumerable<Product>>> GetProducts(
-    CancellationToken cancellationToken)
+  public async Task<ActionResult<IEnumerable<Product>>> GetProductsAsync(CancellationToken cancellationToken)
     => Ok(await _productService.GetProductsAsync(cancellationToken));
 }

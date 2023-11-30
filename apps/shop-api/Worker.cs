@@ -33,7 +33,7 @@ public class Worker : IHostedService
 
     using var dbConnection = appDbContext.CreateConnection();
 
-    var sql = @"
+    const string sql = @"
       CREATE TABLE IF NOT EXISTS
       Cart (
         Id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -51,6 +51,22 @@ public class Worker : IHostedService
         AlcoholByVolume REAL,
         -- Add UNIQUE constraint to prevent duplicates with the `INSERT OR IGNORE` clause.
         UNIQUE([Name])
+      );
+      CREATE TABLE IF NOT EXISTS
+      [Order] (
+        Id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+        UserId TEXT,
+        [DateTime] TEXT
+      );
+      CREATE TABLE IF NOT EXISTS
+      OrderPosition (
+        Id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+        OrderId INTEGER,
+        ProductId INTEGER,
+        Quantity INTEGER,
+        Price REAL,
+        -- Add UNIQUE constraint to allow upserting with the `ON CONFLICT` clause.
+        UNIQUE(OrderId, ProductId)
       );";
 
     await dbConnection.ExecuteAsync(sql);
@@ -62,72 +78,20 @@ public class Worker : IHostedService
 
     using var dbConnection = appDbContext.CreateConnection();
 
-    var sql = @"
+    const string sql = @"
       INSERT OR IGNORE INTO Product([Name], Price, AlcoholByVolume)
-      VALUES(@Name, @Price, @AlcoholByVolume);";
+      VALUES
+        ('Lagavulin 16 Year Old Single Malt Scotch Whisky', 69.9, 43),
+        ('Ardbeg 10 Year Old Single Malt Scotch Whisky', 39.9, 46),
+        ('Knob Creek 9 Year Old Small Batch Kentucky Straight Bourbon Whiskey', 29.9, 50),
+        ('Wild Turkey Rare Breed Barrel Proof Kentucky Straight Bourbon Whiskey', 39.9, 58.4),
+        ('Bushmills 12 Year Old Single Malt Irish Whiskey', 49.9, 40),
+        ('Green Spot Single Pot Still Irish Whiskey', 49.9, 40),
+        ('Montelobos Mezcal Espadín', 39.9, 43.2),
+        ('Marca Negra Mezcal Espadín', 59.9, 49.2),
+        ('Hampden Estate 8 Year Old Pure Single Jamaican Rum', 59.9, 46),
+        ('Appleton Estate 12 Year Old Blended Jamaican Rum', 34.9, 43);";
 
-    await dbConnection.ExecuteAsync(sql, new Product[]
-    {
-      new()
-      {
-        Name = "Lagavulin 16 Year Old Single Malt Scotch Whisky",
-        Price = (decimal) 69.9,
-        AlcoholByVolume = 43
-      },
-      new()
-      {
-        Name = "Ardbeg 10 Year Old Single Malt Scotch Whisky",
-        Price = (decimal) 39.9,
-        AlcoholByVolume = 46
-      },
-      new()
-      {
-        Name = "Knob Creek 9 Year Old Small Batch Kentucky Straight Bourbon Whiskey",
-        Price = (decimal) 29.9,
-        AlcoholByVolume = 50
-      },
-      new()
-      {
-        Name = "Wild Turkey Rare Breed Barrel Proof Kentucky Straight Bourbon Whiskey",
-        Price = (decimal) 39.9,
-        AlcoholByVolume = (decimal) 58.4
-      },
-      new()
-      {
-        Name = "Bushmills 12 Year Old Single Malt Irish Whiskey",
-        Price = (decimal) 49.9,
-        AlcoholByVolume = 40
-      },
-      new()
-      {
-        Name = "Green Spot Single Pot Still Irish Whiskey",
-        Price = (decimal) 49.9,
-        AlcoholByVolume = 40
-      },
-      new()
-      {
-        Name = "Montelobos Mezcal Espadín",
-        Price = (decimal) 39.9,
-        AlcoholByVolume = (decimal) 43.2
-      },
-      new()
-      {
-        Name = "Marca Negra Mezcal Espadín",
-        Price = (decimal) 59.9,
-        AlcoholByVolume = (decimal) 49.2
-      },
-      new()
-      {
-        Name = "Hampden Estate 8 Year Old Pure Single Jamaican Rum",
-        Price = (decimal) 59.9,
-        AlcoholByVolume = 46
-      },
-      new()
-      {
-        Name = "Appleton Estate 12 Year Old Blended Jamaican Rum",
-        Price = (decimal) 34.9,
-        AlcoholByVolume = 43
-      }
-    });
+    await dbConnection.ExecuteAsync(sql);
   }
 }

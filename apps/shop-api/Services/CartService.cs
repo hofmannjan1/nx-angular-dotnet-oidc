@@ -17,9 +17,7 @@ public class CartService : ICartService
   private readonly AppDbContext _appDbContext;
 
   public CartService(AppDbContext appDbContext)
-  {
-    _appDbContext = appDbContext;
-  }
+    => _appDbContext = appDbContext;
 
   /// <summary>
   /// Get a collection of cart positions from a user.
@@ -29,7 +27,7 @@ public class CartService : ICartService
   {
     using var dbConnection = _appDbContext.CreateConnection();
 
-    var sql = @"
+    const string sql = @"
       SELECT Id, UserId, ProductId, Quantity
       FROM Cart
       WHERE UserId = @UserId";
@@ -49,7 +47,7 @@ public class CartService : ICartService
   {
     using var dbConnection = _appDbContext.CreateConnection();
 
-    var sql = @"
+    const string sql = @"
       INSERT INTO Cart(UserId, ProductId, Quantity)
       VALUES (@UserId, @ProductId, @Quantity)
       ON CONFLICT(UserId, ProductId)

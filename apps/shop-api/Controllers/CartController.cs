@@ -15,9 +15,7 @@ public class CartController : ControllerBase
   private readonly ICartService _cartService;
 
   public CartController(ICartService cartService)
-  {
-    _cartService = cartService;
-  }
+    => _cartService = cartService;
 
   [HttpGet("positions")]
   [ProducesResponseType(StatusCodes.Status200OK)]
