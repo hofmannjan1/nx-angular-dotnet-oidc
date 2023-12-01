@@ -18,6 +18,12 @@ builder.Services
     options.SuppressInferBindingSourcesForParameters = true;
   });
 
+builder.Services.Configure<RouteOptions>(options =>
+{
+  // Enforce lowercase route prefixes e.g. /cart instead of /Cart for the CartController.
+  options.LowercaseUrls = true;
+});
+
 builder.Services.AddSingleton<AppDbContext>();
 
 // Use Quartz.NET to perform scheduled tasks e.g. seeding the database.
