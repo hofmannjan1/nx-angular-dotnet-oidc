@@ -20,4 +20,10 @@ export class CartService {
     firstValueFrom(
       this.httpClient.post(`${environment.shopApiUrl}/cart/positions`, { productId, quantity })
     );
+
+  deleteCartPosition = (ids: number[]): Promise<any> =>
+    firstValueFrom(
+      // The controller action automatically splits the comma-separated IDs into IEnumerable<int>.
+      this.httpClient.delete(`${environment.shopApiUrl}/cart/positions?ids=${ids.join(",")}`)
+    );
 }

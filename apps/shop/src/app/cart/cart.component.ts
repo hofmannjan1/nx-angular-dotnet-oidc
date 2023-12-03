@@ -15,4 +15,8 @@ export class CartComponent {
 
   cartPositionsWithProducts = this.appStore.cartPositionsWithProducts;
   cartPositionsLoading = this.appStore.cartPositionsLoading;
+
+  deletePosition(id: number) {
+    this.appStore.deleteCartPositions([id]);
+  }
 }

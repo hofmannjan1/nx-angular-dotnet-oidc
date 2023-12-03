@@ -70,6 +70,10 @@ export const AppStore = signalStore(
         await cartService.addProductToCart(productId, quantity);
         this.loadCartPositions();
       },
+      async deleteCartPositions(ids: number[]): Promise<void> {
+        await cartService.deleteCartPosition(ids);
+        this.loadCartPositions();
+      },
     };
   })
 );
