@@ -44,4 +44,16 @@ public class CartController : ControllerBase
 
     return CreatedAtAction("GetCartPositions", new { id });
   }
+
+  [HttpDelete("positions")]
+  [ProducesResponseType(StatusCodes.Status200OK)]
+  public async Task<IActionResult> DeleteCartPositionsAsync(DeleteCartPositionsRequest request)
+  {
+    var userId = User.GetClaim(Claims.Subject)
+      ?? throw new InvalidOperationException("Could not determine the user.");
+
+    await _cartService.DeleteCartPositionsAsync(userId, request.Ids, request.CancellationToken);
+
+    return Ok();
+  }
 }
