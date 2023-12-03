@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
 import { AsyncPipe, CommonModule, CurrencyPipe } from "@angular/common";
-import { AppStore } from "../app.store";
 import { OidcSecurityService } from "angular-auth-oidc-client";
 import { map } from "rxjs";
+import { AppStore } from "../+state";
 
 @Component({
   selector: "shop-products",

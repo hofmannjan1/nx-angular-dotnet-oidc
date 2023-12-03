@@ -4,7 +4,7 @@ import { RouterModule } from "@angular/router";
 import { NgbCollapse } from "@ng-bootstrap/ng-bootstrap";
 import { OidcSecurityService } from "angular-auth-oidc-client";
 import { map, tap } from "rxjs";
-import { AppStore } from "./app.store";
+import { AppStore } from "./+state";
 
 @Component({
   standalone: true,

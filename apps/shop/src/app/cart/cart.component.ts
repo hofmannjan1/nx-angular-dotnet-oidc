@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { AppStore } from "../app.store";
+import { AppStore } from "../+state";
 
 @Component({
   selector: "shop-cart",
