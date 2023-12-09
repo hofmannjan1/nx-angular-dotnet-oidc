@@ -7,14 +7,14 @@ namespace ShopApi.Controllers;
 [Route("[controller]")]
 public class ProductsController : ControllerBase
 {
-  private readonly IProductService _productService;
+  private readonly IProductsService _productsService;
 
-  public ProductsController(IProductService productService)
-    => _productService = productService;
+  public ProductsController(IProductsService productsService)
+    => _productsService = productsService;
 
   [HttpGet("")]
   [ProducesResponseType(StatusCodes.Status200OK)]
   [Produces("application/json")]
   public async Task<ActionResult<IEnumerable<Product>>> GetProductsAsync(CancellationToken cancellationToken)
-    => Ok(await _productService.GetProductsAsync(cancellationToken));
+    => Ok(await _productsService.GetProductsAsync(cancellationToken));
 }

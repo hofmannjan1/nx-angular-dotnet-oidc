@@ -9,10 +9,10 @@ namespace ShopApi.Controllers;
 [Route("[controller]")]
 public class OrdersController : ControllerBase
 {
-  private readonly IOrderService _orderService;
+  private readonly IOrdersService _ordersService;
 
-  public OrdersController(IOrderService orderService)
-    => _orderService = orderService;
+  public OrdersController(IOrdersService ordersService)
+    => _ordersService = ordersService;
 
   [HttpGet("")]
   [ProducesResponseType(StatusCodes.Status200OK)]
@@ -23,6 +23,6 @@ public class OrdersController : ControllerBase
     var userId = User.GetClaim(Subject)
       ?? throw new InvalidOperationException("Could not determine the user.");
 
-    return Ok(await _orderService.GetOrdersAsync(userId, cancellationToken));
+    return Ok(await _ordersService.GetOrdersAsync(userId, cancellationToken));
   }
 }

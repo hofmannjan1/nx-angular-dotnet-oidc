@@ -1,5 +1,5 @@
 <h1 class="mb-3">Cart</h1>
-@if (cartPositionsLoading()) {
+@if (positionsLoading()) {
 <div class="spinner-border">
   <span class="visually-hidden">Loading...</span>
 </div>
@@ -14,7 +14,7 @@
     </tr>
   </thead>
   <tbody>
-    @for (position of cartPositionsWithProducts(); track position.id) {
+    @for (position of positionsWithProducts(); track position.id) {
     <tr>
       <th>{{ $index + 1 }}</th>
       <td>{{ position.product.name }}</td>

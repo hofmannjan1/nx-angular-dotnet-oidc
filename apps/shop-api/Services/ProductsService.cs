@@ -3,27 +3,27 @@ using ShopApi.Data;
 
 namespace ShopApi.Services;
 
-public interface IProductService
+public interface IProductsService
 {
   Task<IEnumerable<Product>> GetProductsAsync(CancellationToken cancellationToken);
 }
 
-public class ProductService : IProductService
+public class ProductsService : IProductsService
 {
   private readonly AppDbContext _appDbContext;
 
-  public ProductService(AppDbContext appDbContext)
+  public ProductsService(AppDbContext appDbContext)
     => _appDbContext = appDbContext;
 
   public async Task<IEnumerable<Product>> GetProductsAsync(CancellationToken cancellationToken)
   {
-    using var dbConnection = _appDbContext.CreateConnection();
+    using var connection = _appDbContext.CreateConnection();
 
     const string sql = @"
       SELECT Id, Name, Price, AlcoholByVolume
       FROM Product";
 
-    return await dbConnection.QueryAsync<Product>(new CommandDefinition(sql,
+    return await connection.QueryAsync<Product>(new CommandDefinition(sql,
       cancellationToken: cancellationToken));
   }
 }

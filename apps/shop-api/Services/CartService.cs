@@ -10,6 +10,7 @@
  */
 using Dapper;
 using ShopApi.Data;
+using ShopApi.Utilities;
 
 namespace ShopApi.Services;
 
@@ -18,7 +19,7 @@ namespace ShopApi.Services;
 // along with its implementation.
 public interface ICartService
 {
-  Task<IEnumerable<CartPosition>> GetCartPositionsAsync(string userId,
+  Task<IEnumerable<CartPosition>> GetCartPositionsAsync(string userId, IEnumerable<int>? ids,
     CancellationToken cancellationToken);
 
   Task<int> UpsertCartPositionAsync(string userId, int productId, int? quantity,
@@ -26,6 +27,9 @@ public interface ICartService
 
   Task DeleteCartPositionsAsync(string userId, IEnumerable<int> ids,
     CancellationToken cancellationToken);
+
+  Task<IEnumerable<int>> CreateOrderPositionsFromCartPositionsAsync(string userId, int orderId,
+    IEnumerable<int>? ids, CancellationToken cancellationToken);
 }
 
 public class CartService : ICartService
@@ -38,19 +42,21 @@ public class CartService : ICartService
   /// <summary>
   /// Get a collection of cart positions from a user.
   /// </summary>
-  public async Task<IEnumerable<CartPosition>> GetCartPositionsAsync(string userId,
+  public async Task<IEnumerable<CartPosition>> GetCartPositionsAsync(string userId, IEnumerable<int>? ids,
     CancellationToken cancellationToken)
   {
-    using var dbConnection = _appDbContext.CreateConnection();
+    using var connection = _appDbContext.CreateConnection();
 
-    const string sql = @"
+    var sql = $@"
       SELECT Id, UserId, ProductId, Quantity
       FROM Cart
-      WHERE UserId = @UserId";
+      WHERE UserId = @UserId
+      {(!ids.IsNullOrEmpty() ? "AND Id IN @Ids" : "")}";
 
-    return await dbConnection.QueryAsync<CartPosition>(new CommandDefinition(sql, new
+    return await connection.QueryAsync<CartPosition>(new CommandDefinition(sql, new
     {
-      UserId = userId
+      UserId = userId,
+      Ids = ids
     }, cancellationToken: cancellationToken));
   }
 
@@ -61,7 +67,7 @@ public class CartService : ICartService
   public async Task<int> UpsertCartPositionAsync(string userId, int productId, int? quantity,
     CancellationToken cancellationToken)
   {
-    using var dbConnection = _appDbContext.CreateConnection();
+    using var connection = _appDbContext.CreateConnection();
 
     const string sql = @"
       INSERT INTO Cart(UserId, ProductId, Quantity)
@@ -70,7 +76,7 @@ public class CartService : ICartService
       DO UPDATE SET Quantity = Quantity + @Quantity
       RETURNING Id";
 
-    return await dbConnection.QuerySingleAsync<int>(new CommandDefinition(sql, new
+    return await connection.QuerySingleAsync<int>(new CommandDefinition(sql, new
     {
       UserId = userId,
       ProductId = productId,
@@ -81,16 +87,42 @@ public class CartService : ICartService
   /// <summary>
   /// Delete cart positions by IDs.
   /// </summary>
-  public async Task DeleteCartPositionsAsync(string userId, IEnumerable<int> ids, CancellationToken cancellationToken)
+  public async Task DeleteCartPositionsAsync(string userId, IEnumerable<int> ids,
+    CancellationToken cancellationToken)
   {
-    using var dbConnection = _appDbContext.CreateConnection();
+    using var connection = _appDbContext.CreateConnection();
 
     const string sql = @"
       DELETE FROM Cart
       WHERE UserId = @UserId AND Id IN @Ids";
 
-    await dbConnection.ExecuteAsync(new CommandDefinition(sql, new
+    await connection.ExecuteAsync(new CommandDefinition(sql, new
     {
+      UserId = userId,
+      Ids = ids
+    }, cancellationToken: cancellationToken));
+  }
+
+  public async Task<IEnumerable<int>> CreateOrderPositionsFromCartPositionsAsync(string userId,
+    int orderId, IEnumerable<int>? ids, CancellationToken cancellationToken)
+  {
+    using var connection = _appDbContext.CreateConnection();
+
+    var sql = $@"
+    INSERT INTO OrderPosition (OrderId, ProductId, Quantity, Price)
+    SELECT
+      @OrderId,
+      Cart.ProductId,
+      Cart.Quantity,
+      Product.Price
+    FROM Cart
+    JOIN Product ON Product.Id = Cart.ProductId
+    WHERE Cart.UserId = @UserId {(!ids.IsNullOrEmpty() ? "AND Cart.Id IN @Ids" : "")}
+    RETURNING OrderPosition.Id;";
+
+    return await connection.QueryAsync<int>(new CommandDefinition(sql, new
+    {
+      OrderId = orderId,
       UserId = userId,
       Ids = ids
     }, cancellationToken: cancellationToken));

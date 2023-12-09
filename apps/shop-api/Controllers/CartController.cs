@@ -13,9 +13,13 @@ namespace ShopApi.Controllers;
 public class CartController : ControllerBase
 {
   private readonly ICartService _cartService;
+  private readonly IOrdersService _ordersService;
 
-  public CartController(ICartService cartService)
-    => _cartService = cartService;
+  public CartController(ICartService cartService, IOrdersService ordersService)
+  {
+    _cartService = cartService;
+    _ordersService = ordersService;
+  }
 
   [HttpGet("positions")]
   [ProducesResponseType(StatusCodes.Status200OK)]
@@ -26,7 +30,7 @@ public class CartController : ControllerBase
     var userId = User.GetClaim(Claims.Subject)
       ?? throw new InvalidOperationException("Could not determine the user.");
 
-    return Ok(await _cartService.GetCartPositionsAsync(userId, cancellationToken));
+    return Ok(await _cartService.GetCartPositionsAsync(userId, null, cancellationToken));
   }
 
   [HttpPost("positions")]
@@ -53,6 +57,21 @@ public class CartController : ControllerBase
       ?? throw new InvalidOperationException("Could not determine the user.");
 
     await _cartService.DeleteCartPositionsAsync(userId, request.Ids, request.CancellationToken);
+
+    return Ok();
+  }
+
+  [HttpPost("positions/order")]
+  [ProducesResponseType(StatusCodes.Status200OK)]
+  public async Task<IActionResult> OrderCartPositionsAsync(OrderCartPositionsRequest request)
+  {
+    var userId = User.GetClaim(Claims.Subject)
+      ?? throw new InvalidOperationException("Could not determine the user.");
+
+    var orderId = await _ordersService.CreateEmptyOrderAsync(userId, request.CancellationToken);
+
+    await _cartService.CreateOrderPositionsFromCartPositionsAsync(userId, orderId, request.Ids,
+      request.CancellationToken);
 
     return Ok();
   }
