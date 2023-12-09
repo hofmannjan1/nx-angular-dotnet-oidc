@@ -20,7 +20,8 @@ export class AppComponent {
   isMenuCollapsed = true;
   isUserAuthenticated$ = this.oidcSecurityService.isAuthenticated$.pipe(
     map((x) => x.isAuthenticated),
-    tap((x) => (x ? this.appStore.loadCartPositions() : {}))
+    tap((x) => (x ? this.appStore.loadCartPositions() : {})),
+    tap((x) => (x ? this.appStore.loadOrders() : {}))
   );
   userData$ = this.oidcSecurityService.userData$;
 

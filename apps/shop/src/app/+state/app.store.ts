@@ -1,4 +1,4 @@
-/**
+/*
  * ABOUT THIS FILE
  *
  * This files includes the state and state management using @ngrx/signals store. This is a light-
@@ -10,7 +10,7 @@
  * https://github.com/angular-architects.
  */
 import { signalStore, withState } from "@ngrx/signals";
-import { CartPosition, Product } from "../core/models";
+import { CartPosition, Order, Product } from "../core/models";
 import { withAppComputed } from "./app.computed";
 import { withAppMethods } from "./app.methods";
 
@@ -19,6 +19,8 @@ export type AppState = {
   productsLoading: boolean;
   cartPositions: Record<number, CartPosition>;
   cartPositionsLoading: boolean;
+  orders: Record<number, Order>;
+  ordersLoading: boolean;
 };
 
 export const initialAppState = {
@@ -26,6 +28,8 @@ export const initialAppState = {
   productsLoading: false,
   cartPositions: {},
   cartPositionsLoading: false,
+  orders: {},
+  ordersLoading: false,
 };
 
 export const AppStore = signalStore(

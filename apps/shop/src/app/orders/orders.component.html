@@ -1,0 +1,23 @@
+<h1 class="mb-3">Orders</h1>
+@if (ordersLoading()) {
+  <div class="spinner-border">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+} @else {
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (order of ordersByDate(); track order.id) {
+        <tr>
+          <th>{{ order.dateTime | date: "dd.MM.YYYY hh:mm" }}</th>
+          <td>{{ order.totalPrice | currency: "EUR" }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}

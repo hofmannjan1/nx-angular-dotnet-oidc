@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
-import { AsyncPipe, CommonModule, CurrencyPipe } from "@angular/common";
+import { AsyncPipe, CurrencyPipe, KeyValuePipe } from "@angular/common";
 import { OidcSecurityService } from "angular-auth-oidc-client";
 import { map } from "rxjs";
 import { AppStore } from "../+state";
@@ -7,7 +7,7 @@ import { AppStore } from "../+state";
 @Component({
   selector: "shop-products",
   standalone: true,
-  imports: [CommonModule, AsyncPipe, CurrencyPipe],
+  imports: [KeyValuePipe, AsyncPipe, CurrencyPipe],
   templateUrl: "products.component.html",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

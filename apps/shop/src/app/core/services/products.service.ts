@@ -1,4 +1,4 @@
-/**
+/*
  * ABOUT THIS FILE
  *
  * This file includes the service that communicates with the shop API's ProductsController via HTTP.
@@ -10,7 +10,7 @@ import { Product } from "../models";
 import { environment } from "../../../environments/environment";
 
 @Injectable({ providedIn: "root" })
-export class ProductService {
+export class ProductsService {
   private httpClient = inject(HttpClient);
 
   getProducts = (): Promise<Product[]> =>

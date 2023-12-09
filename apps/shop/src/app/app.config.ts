@@ -1,4 +1,4 @@
-/**
+/*
  * ABOUT THIS FILE
  *
  * This files includes the initial application configuration. This is a lightweight alternative to

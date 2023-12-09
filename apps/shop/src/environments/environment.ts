@@ -1,4 +1,4 @@
-/**
+/*
  * ABOUT THIS FILE
  *
  * This file includes environment-specific configuration values and is used for development. Use

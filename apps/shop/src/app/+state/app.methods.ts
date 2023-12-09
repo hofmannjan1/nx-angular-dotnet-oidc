@@ -1,4 +1,4 @@
-/**
+/*
  * ABOUT THIS FILE
  *
  * This file encapsulates all methods into a custom signal store feature.
@@ -9,23 +9,25 @@
  */
 import { patchState, signalStoreFeature, type, withMethods } from "@ngrx/signals";
 import { inject } from "@angular/core";
-import { Product, CartPosition } from "../core/models";
-import { ProductService, CartService } from "../core/services";
+import { Product, CartPosition, Order } from "../core/models";
+import { ProductsService, CartService } from "../core/services";
 import { createRecord } from "../core/utils";
 import { AppState } from ".";
+import { OrdersService } from "../core/services/orders.service";
 
 export function withAppMethods() {
   return signalStoreFeature(
     { state: type<AppState>() },
     withMethods((state) => {
-      const productService = inject(ProductService);
+      const productsService = inject(ProductsService);
       const cartService = inject(CartService);
+      const ordersService = inject(OrdersService);
 
       return {
         // Products
         async loadProducts(): Promise<void> {
           patchState(state, { productsLoading: true });
-          const products = await productService.getProducts();
+          const products = await productsService.getProducts();
           patchState(state, {
             products: createRecord<number, Product>(products, (x) => x.id),
             productsLoading: false,
@@ -47,6 +49,20 @@ export function withAppMethods() {
         async deleteCartPositions(ids: number[]): Promise<void> {
           await cartService.deleteCartPosition(ids);
           this.loadCartPositions();
+        },
+        async orderCartPositions(ids: number[]): Promise<void> {
+          await cartService.orderCartPositions(ids);
+          this.loadCartPositions();
+          this.loadOrders();
+        },
+        // Orders
+        async loadOrders(): Promise<void> {
+          patchState(state, { ordersLoading: true });
+          const orders = await ordersService.getOrders();
+          patchState(state, {
+            orders: createRecord<number, Order>(orders, (x) => x.id),
+            ordersLoading: false,
+          });
         },
       };
     })

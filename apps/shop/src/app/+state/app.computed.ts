@@ -1,4 +1,4 @@
-/**
+/*
  * ABOUT THIS FILE
  *
  * This file encapsulates all computed signals into a custom signal store feature.
@@ -17,6 +17,9 @@ export function withAppComputed() {
     { state: type<AppState>() },
     withComputed((state) => ({
       cartPositionCount: computed(() => Object.values(state.cartPositions()).length),
+      cartPositionIds: computed(() =>
+        Object.values(state.cartPositions()).map((x) => x.id as number)
+      ),
       cartPositionsWithProducts: computed(() =>
         Object.values(state.cartPositions())
           .map((x) => ({
@@ -27,6 +30,9 @@ export function withAppComputed() {
           // `Product | undefined` but instead to be definitely of type `Product`. Intersection is
           // the easiest way to apply a type guard to one property without listing all properties.
           .filter((x): x is CartPosition & { product: Product } => x.product !== undefined)
+      ),
+      ordersByDate: computed(() =>
+        Object.values(state.orders()).sort((a, b) => b.dateTime.localeCompare(a.dateTime))
       ),
     }))
   );

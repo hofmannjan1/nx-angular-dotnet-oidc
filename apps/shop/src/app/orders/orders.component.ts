@@ -1,12 +1,18 @@
-import { ChangeDetectionStrategy, Component } from "@angular/core";
-import { CommonModule } from "@angular/common";
+import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
+import { CurrencyPipe, DatePipe, KeyValuePipe } from "@angular/common";
+import { AppStore } from "../+state";
 
 @Component({
   selector: "shop-orders",
   standalone: true,
-  imports: [CommonModule],
-  template: `<p>orders works!</p>`,
+  imports: [KeyValuePipe, DatePipe, CurrencyPipe],
+  templateUrl: "orders.component.html",
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class OrdersComponent {}
+export class OrdersComponent {
+  private appStore = inject(AppStore);
+
+  ordersByDate = this.appStore.ordersByDate;
+  ordersLoading = this.appStore.ordersLoading;
+}

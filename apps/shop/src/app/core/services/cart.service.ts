@@ -1,9 +1,9 @@
-/**
+/*
  * ABOUT THIS FILE
  *
  * This file includes the service that communicates with the shop API's CartController via HTTP.
  */
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
 import { firstValueFrom } from "rxjs";
 import { CartPosition } from "../models";
@@ -21,9 +21,19 @@ export class CartService {
       this.httpClient.post(`${environment.shopApiUrl}/cart/positions`, { productId, quantity })
     );
 
-  deleteCartPosition = (ids: number[]): Promise<any> =>
-    firstValueFrom(
-      // The controller action automatically splits the comma-separated IDs into IEnumerable<int>.
-      this.httpClient.delete(`${environment.shopApiUrl}/cart/positions?ids=${ids.join(",")}`)
+  deleteCartPosition = (ids: number[]): Promise<any> => {
+    let params = new HttpParams().appendAll({ ids: ids });
+
+    return firstValueFrom(
+      this.httpClient.delete(`${environment.shopApiUrl}/cart/positions?${params}`)
     );
+  };
+
+  orderCartPositions = (ids: number[]): Promise<any> => {
+    let params = new HttpParams().appendAll({ ids: ids });
+
+    return firstValueFrom(
+      this.httpClient.post(`${environment.shopApiUrl}/cart/positions/order?${params}`, {})
+    );
+  };
 }
