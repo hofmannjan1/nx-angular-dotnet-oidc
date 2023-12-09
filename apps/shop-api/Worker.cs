@@ -1,6 +1,5 @@
-﻿using Dapper;
+using Dapper;
 using ShopApi.Data;
-using ShopApi.Services;
 
 namespace ShopApi;
 
@@ -8,10 +7,7 @@ public class Worker : IHostedService
 {
   private readonly IServiceProvider _serviceProvider;
 
-  public Worker(IServiceProvider serviceProvider)
-  {
-    _serviceProvider = serviceProvider;
-  }
+  public Worker(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
 
   public async Task StartAsync(CancellationToken cancellationToken)
   {

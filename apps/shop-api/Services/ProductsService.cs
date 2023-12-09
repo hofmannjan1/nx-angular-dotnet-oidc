@@ -1,4 +1,4 @@
-﻿using Dapper;
+using Dapper;
 using ShopApi.Data;
 
 namespace ShopApi.Services;
@@ -23,7 +23,7 @@ public class ProductsService : IProductsService
       SELECT Id, Name, Price, AlcoholByVolume
       FROM Product";
 
-    return await context.Connection.QueryAsync<Product>(new CommandDefinition(sql, 
+    return await context.Connection.QueryAsync<Product>(new CommandDefinition(sql,
       transaction: context.Transaction, cancellationToken: cancellationToken));
   }
 }

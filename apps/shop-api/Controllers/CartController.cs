@@ -17,7 +17,7 @@ public class CartController : ControllerBase
   private readonly IOrdersService _ordersService;
   private readonly IAppDbContextFactory _appDbContextFactory;
 
-  public CartController(ICartService cartService, IOrdersService ordersService, 
+  public CartController(ICartService cartService, IOrdersService ordersService,
     IAppDbContextFactory appDbContextFactory)
   {
     _cartService = cartService;
@@ -40,8 +40,6 @@ public class CartController : ControllerBase
   [HttpPost("positions")]
   [ProducesResponseType(StatusCodes.Status201Created)]
   [Consumes("application/json"), Produces("application/json")]
-  // Use `SuppressInferBindingSourcesForParameters` to prevent .NET from inferring the FromBody
-  // binding source for the CreateCartPositionRequest.
   public async Task<IActionResult> CreateCartPositionAsync(CreateCartPositionRequest request)
   {
     var userId = User.GetClaim(Claims.Subject)
@@ -81,9 +79,9 @@ public class CartController : ControllerBase
       // Begin the transaction.
       await unitOfWork.BeginAsync();
 
-      // The AppDbContextFactory takes care if there is an open unit of work and provides its
-      // database context with the same transaction to the service. You don't have to inject the
-      // transaction into the service methods.
+      // The AppDbContextFactory takes care if there is an active unit of work and provides its
+      // database context with the same connection and transaction to the service. You don't have
+      // to inject the transaction into the service methods.
 
       var orderId = await _ordersService.CreateEmptyOrderAsync(userId, request.CancellationToken);
 

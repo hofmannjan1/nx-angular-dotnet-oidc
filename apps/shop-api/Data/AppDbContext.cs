@@ -26,25 +26,24 @@ public class AppDbContext : IAppDbContext
   public SqliteTransaction? Transaction { get; set; }
   public bool IsDisposed { get; set; }
 
-  private readonly bool _isUnitOfWork;
+  private readonly bool _isUnitOfWorkContext;
 
-  public AppDbContext(string connectionString, bool isUnitOfWork = false)
+  public AppDbContext(string connectionString, bool isUnitOfWorkContext = false)
   {
     Connection = new SqliteConnection(connectionString);
     Connection.Open();
 
-    _isUnitOfWork = isUnitOfWork;
+    _isUnitOfWorkContext = isUnitOfWorkContext;
   }
 
   public void Dispose()
   {
     // If there is an unit of work, let it take care of the disposal of the transaction/connection.
-    if (_isUnitOfWork)
+    if (_isUnitOfWorkContext)
       return;
 
     Transaction?.Dispose();
     Connection?.Dispose();
-
     IsDisposed = true;
   }
 }

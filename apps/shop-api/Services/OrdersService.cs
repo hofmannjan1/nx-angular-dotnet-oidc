@@ -1,4 +1,4 @@
-﻿using Dapper;
+using Dapper;
 using ShopApi.Data;
 
 namespace ShopApi.Services;
@@ -31,7 +31,7 @@ public class OrdersService : IOrdersService
       FROM [Order]
       WHERE UserId = @UserId";
 
-    return await context.Connection.QueryAsync<Order>(new CommandDefinition(sql, 
+    return await context.Connection.QueryAsync<Order>(new CommandDefinition(sql,
       new { UserId = userId }, context.Transaction, cancellationToken: cancellationToken));
   }
 
@@ -44,7 +44,7 @@ public class OrdersService : IOrdersService
       VALUES (@UserId, DATETIME('now'))
       RETURNING Id;";
 
-    return await context.Connection.QuerySingleAsync<int>(new CommandDefinition(sql, 
+    return await context.Connection.QuerySingleAsync<int>(new CommandDefinition(sql,
       new { UserId = userId }, context.Transaction, cancellationToken: cancellationToken));
   }
 }

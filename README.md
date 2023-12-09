@@ -1,5 +1,23 @@
 # Nx full-stack Angular + .NET workspace with OIDC
 
+## Architecture overview
+
+- Angular shop application
+
+  - Angular 17
+  - Full use of standalone components and the functional APIs
+  - Reactive state management using [@ngrx/signals](https://www.npmjs.com/package/@ngrx/signals)
+  - OAuth 2.0 authorization code flow + PKCE and refresh tokens using [angular-auth-oidc-client](https://www.npmjs.com/package/angular-auth-oidc-client)
+
+- Shop web API
+
+  - .NET 8
+  - Restful HTTP controllers
+  - SQLite database with a custom unit of work implementation on top of [Dapper](https://www.nuget.org/packages/Dapper)
+  - Auto-generated OpenAPI documentation using [Swashbuckle.AspNetCore](https://www.nuget.org/packages/Swashbuckle.AspNetCore)
+  - OAuth 2.0 bearer token authorization with introspection using [OpenIddict.AspNetCore](https://www.nuget.org/packages/OpenIddict.AspNetCore)
+  - Job scheduling using [Quartz](https://www.nuget.org/packages/Quartz)
+
 ## Quick Start
 
 Angular Shop application

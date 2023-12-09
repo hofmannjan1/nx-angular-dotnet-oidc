@@ -9,8 +9,8 @@ public class ProductsController : ControllerBase
 {
   private readonly IProductsService _productsService;
 
-  public ProductsController(IProductsService productsService)
-    => _productsService = productsService;
+  public ProductsController(IProductsService productsService) =>
+      _productsService = productsService;
 
   [HttpGet("")]
   [ProducesResponseType(StatusCodes.Status200OK)]

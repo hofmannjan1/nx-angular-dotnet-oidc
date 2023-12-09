@@ -1,4 +1,4 @@
-﻿/*
+/*
  * ABOUT THIS FILE
  *
  * This files encapsulates the database access to perform operations on the user's cart. Usually,
@@ -42,7 +42,7 @@ public class CartService : ICartService
   /// <summary>
   /// Get a collection of cart positions from a user.
   /// </summary>
-  public async Task<IEnumerable<CartPosition>> GetCartPositionsAsync(string userId, 
+  public async Task<IEnumerable<CartPosition>> GetCartPositionsAsync(string userId,
     IEnumerable<int>? ids, CancellationToken cancellationToken)
   {
     using var context = _appDbContextFactory.CreateContext();

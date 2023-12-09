@@ -1,9 +1,9 @@
-﻿/*
+/*
  * ABOUT THIS FILE
  *
  * This file is part of a basic implementation of the unit of work pattern for Dapper inspired by
  * Nathan Cooper. The factory provides methods to create a database context or an unit of work. If
- * there is an open unit of work, it will return the database context from the unit of work,
+ * there is an active unit of work, it will return the database context from the unit of work,
  * including the transaction. Otherwise, it will return a new database context without transaction.
  *
  * Inspired by https://nathancooper.dev/articles/2020-03/unit-of-work-pattern
@@ -21,7 +21,7 @@ public class AppDbContextFactory : IAppDbContextFactory
   private readonly string _connectionString;
   private IUnitOfWork? _unitOfWork;
 
-  private bool IsUnitOfWorkOpen => _unitOfWork is not null && !_unitOfWork.IsDisposed;
+  private bool IsUnitOfWorkActive => _unitOfWork is not null && !_unitOfWork.IsDisposed;
 
   public AppDbContextFactory()
   {
@@ -33,8 +33,14 @@ public class AppDbContextFactory : IAppDbContextFactory
   }
 
   public IAppDbContext CreateContext() =>
-    IsUnitOfWorkOpen ? _unitOfWork!.Context : new AppDbContext(_connectionString);
+    IsUnitOfWorkActive ? _unitOfWork!.Context : new AppDbContext(_connectionString);
 
-  public IUnitOfWork CreateUnitOfWork() =>
-    IsUnitOfWorkOpen ? _unitOfWork! : _unitOfWork = new UnitOfWork(_connectionString);
+  public IUnitOfWork CreateUnitOfWork()
+  {
+    if (IsUnitOfWorkActive)
+      throw new InvalidOperationException(
+        "Could not begin a unit of work because there already exist an active unit of work.");
+
+    return _unitOfWork = new UnitOfWork(_connectionString);
+  }
 }

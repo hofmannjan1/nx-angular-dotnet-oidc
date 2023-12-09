@@ -11,8 +11,8 @@ public class OrdersController : ControllerBase
 {
   private readonly IOrdersService _ordersService;
 
-  public OrdersController(IOrdersService ordersService)
-    => _ordersService = ordersService;
+  public OrdersController(IOrdersService ordersService) =>
+    _ordersService = ordersService;
 
   [HttpGet("")]
   [ProducesResponseType(StatusCodes.Status200OK)]

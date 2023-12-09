@@ -1,4 +1,4 @@
-﻿namespace ShopApi.Services;
+namespace ShopApi.Services;
 
 public class Order
 {
