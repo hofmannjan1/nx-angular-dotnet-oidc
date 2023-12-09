@@ -10,20 +10,20 @@ public interface IProductsService
 
 public class ProductsService : IProductsService
 {
-  private readonly AppDbContext _appDbContext;
+  private readonly IAppDbContextFactory _appDbContextFactory;
 
-  public ProductsService(AppDbContext appDbContext)
-    => _appDbContext = appDbContext;
+  public ProductsService(IAppDbContextFactory appDbContextFactory)
+    => _appDbContextFactory = appDbContextFactory;
 
   public async Task<IEnumerable<Product>> GetProductsAsync(CancellationToken cancellationToken)
   {
-    using var connection = _appDbContext.CreateConnection();
+    using var context = _appDbContextFactory.CreateContext();
 
     const string sql = @"
       SELECT Id, Name, Price, AlcoholByVolume
       FROM Product";
 
-    return await connection.QueryAsync<Product>(new CommandDefinition(sql,
-      cancellationToken: cancellationToken));
+    return await context.Connection.QueryAsync<Product>(new CommandDefinition(sql, 
+      transaction: context.Transaction, cancellationToken: cancellationToken));
   }
 }

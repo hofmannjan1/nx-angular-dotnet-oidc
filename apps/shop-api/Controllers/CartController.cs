@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OpenIddict.Abstractions;
 using ShopApi.Contracts;
+using ShopApi.Data;
 using ShopApi.Services;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
@@ -14,11 +15,14 @@ public class CartController : ControllerBase
 {
   private readonly ICartService _cartService;
   private readonly IOrdersService _ordersService;
+  private readonly IAppDbContextFactory _appDbContextFactory;
 
-  public CartController(ICartService cartService, IOrdersService ordersService)
+  public CartController(ICartService cartService, IOrdersService ordersService, 
+    IAppDbContextFactory appDbContextFactory)
   {
     _cartService = cartService;
     _ordersService = ordersService;
+    _appDbContextFactory = appDbContextFactory;
   }
 
   [HttpGet("positions")]
@@ -68,10 +72,35 @@ public class CartController : ControllerBase
     var userId = User.GetClaim(Claims.Subject)
       ?? throw new InvalidOperationException("Could not determine the user.");
 
-    var orderId = await _ordersService.CreateEmptyOrderAsync(userId, request.CancellationToken);
+    // A unit of work executes all commands between `BeginAsync()` and `CommitAsync()` in a single
+    // transaction.
+    using var unitOfWork = _appDbContextFactory.CreateUnitOfWork();
 
-    await _cartService.CreateOrderPositionsFromCartPositionsAsync(userId, orderId, request.Ids,
-      request.CancellationToken);
+    try
+    {
+      // Begin the transaction.
+      await unitOfWork.BeginAsync();
+
+      // The AppDbContextFactory takes care if there is an open unit of work and provides its
+      // database context with the same transaction to the service. You don't have to inject the
+      // transaction into the service methods.
+
+      var orderId = await _ordersService.CreateEmptyOrderAsync(userId, request.CancellationToken);
+
+      await _cartService.CreateOrderPositionsFromCartPositionsAsync(userId, orderId, request.Ids,
+        request.CancellationToken);
+
+      await _cartService.DeleteCartPositionsAsync(userId, request.Ids, request.CancellationToken);
+
+      // Commit the changes if all commands are successful.
+      await unitOfWork.CommitAsync();
+    }
+    catch (Exception)
+    {
+      // Roll back the changes if one of the commands throws an error.
+      await unitOfWork.RollbackAsync();
+      throw;
+    }
 
     return Ok();
   }

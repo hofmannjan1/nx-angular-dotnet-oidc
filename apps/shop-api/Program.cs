@@ -24,7 +24,7 @@ builder.Services.Configure<RouteOptions>(options =>
   options.LowercaseUrls = true;
 });
 
-builder.Services.AddSingleton<AppDbContext>();
+builder.Services.AddSingleton<IAppDbContextFactory, AppDbContextFactory>();
 
 // Use Quartz.NET to perform scheduled tasks e.g. seeding the database.
 // This requires the `Quartz.Extensions.DependencyInjection` package to be installed.

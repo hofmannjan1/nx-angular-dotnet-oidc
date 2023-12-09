@@ -15,6 +15,7 @@ public class ProductsController : ControllerBase
   [HttpGet("")]
   [ProducesResponseType(StatusCodes.Status200OK)]
   [Produces("application/json")]
-  public async Task<ActionResult<IEnumerable<Product>>> GetProductsAsync(CancellationToken cancellationToken)
-    => Ok(await _productsService.GetProductsAsync(cancellationToken));
+  public async Task<ActionResult<IEnumerable<Product>>>
+    GetProductsAsync(CancellationToken cancellationToken) =>
+    Ok(await _productsService.GetProductsAsync(cancellationToken));
 }

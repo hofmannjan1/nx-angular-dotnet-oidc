@@ -12,15 +12,15 @@ public interface IOrdersService
 
 public class OrdersService : IOrdersService
 {
-  private readonly AppDbContext _appDbContext;
+  private readonly IAppDbContextFactory _appDbContextFactory;
 
-  public OrdersService(AppDbContext appDbContext)
-    => _appDbContext = appDbContext;
+  public OrdersService(IAppDbContextFactory appDbContextFactory)
+    => _appDbContextFactory = appDbContextFactory;
 
   public async Task<IEnumerable<Order>> GetOrdersAsync(string userId,
     CancellationToken cancellationToken)
   {
-    using var connection = _appDbContext.CreateConnection();
+    using var context = _appDbContextFactory.CreateContext();
 
     const string sql = @"
       SELECT Id, UserId, [DateTime], ROUND((
@@ -31,20 +31,20 @@ public class OrdersService : IOrdersService
       FROM [Order]
       WHERE UserId = @UserId";
 
-    return await connection.QueryAsync<Order>(new CommandDefinition(sql, new { UserId = userId },
-      cancellationToken: cancellationToken));
+    return await context.Connection.QueryAsync<Order>(new CommandDefinition(sql, 
+      new { UserId = userId }, context.Transaction, cancellationToken: cancellationToken));
   }
 
   public async Task<int> CreateEmptyOrderAsync(string userId, CancellationToken cancellationToken)
   {
-    using var connection = _appDbContext.CreateConnection();
+    using var context = _appDbContextFactory.CreateContext();
 
     const string sql = @"
       INSERT INTO [Order] (UserId, [DateTime])
       VALUES (@UserId, DATETIME('now'))
       RETURNING Id;";
 
-    return await connection.QuerySingleAsync<int>(new CommandDefinition(sql, new { UserId = userId },
-      cancellationToken: cancellationToken));
+    return await context.Connection.QuerySingleAsync<int>(new CommandDefinition(sql, 
+      new { UserId = userId }, context.Transaction, cancellationToken: cancellationToken));
   }
 }

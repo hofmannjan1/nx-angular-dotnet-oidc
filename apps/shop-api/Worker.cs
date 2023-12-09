@@ -29,9 +29,9 @@ public class Worker : IHostedService
   /// </summary>
   private static async Task CreateDatabaseTablesAsync(IServiceProvider serviceProvider)
   {
-    var appDbContext = serviceProvider.GetRequiredService<AppDbContext>();
+    var factory = serviceProvider.GetRequiredService<IAppDbContextFactory>();
 
-    using var dbConnection = appDbContext.CreateConnection();
+    using var context = factory.CreateContext();
 
     const string sql = @"
       CREATE TABLE IF NOT EXISTS
@@ -69,14 +69,14 @@ public class Worker : IHostedService
         UNIQUE(OrderId, ProductId)
       );";
 
-    await dbConnection.ExecuteAsync(sql);
+    await context.Connection.ExecuteAsync(sql);
   }
 
   private static async Task CreateProductsAsync(IServiceProvider serviceProvider)
   {
-    var appDbContext = serviceProvider.GetRequiredService<AppDbContext>();
+    var factory = serviceProvider.GetRequiredService<IAppDbContextFactory>();
 
-    using var dbConnection = appDbContext.CreateConnection();
+    using var context = factory.CreateContext();
 
     const string sql = @"
       INSERT OR IGNORE INTO Product([Name], Price, AlcoholByVolume)
@@ -92,6 +92,6 @@ public class Worker : IHostedService
         ('Hampden Estate 8 Year Old Pure Single Jamaican Rum', 59.9, 46),
         ('Appleton Estate 12 Year Old Blended Jamaican Rum', 34.9, 43);";
 
-    await dbConnection.ExecuteAsync(sql);
+    await context.Connection.ExecuteAsync(sql);
   }
 }
