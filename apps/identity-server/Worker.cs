@@ -21,6 +21,7 @@ public class Worker : IHostedService
 
     // Seed the database.
     await RegisterApplicationsAsync(scope.ServiceProvider);
+    await RegisterCustomScopesAsync(scope.ServiceProvider);
   }
 
   public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
@@ -63,7 +64,9 @@ public class Worker : IHostedService
           Permissions.ResponseTypes.Code,
           // The application is permitted to use the scopes.
           Permissions.Scopes.Email,
-          Permissions.Scopes.Profile
+          Permissions.Scopes.Profile,
+          // Including the custom scope to access the shop API.
+          Permissions.Prefixes.Scope + "shop_api"
         },
         Requirements =
         {
@@ -85,6 +88,22 @@ public class Worker : IHostedService
           // The resource server is permitted to use the introspection endpoint to validate tokens.
           Permissions.Endpoints.Introspection
         }
+      });
+    }
+  }
+
+  private static async Task RegisterCustomScopesAsync(IServiceProvider serviceProvider)
+  {
+    var scopeManager = serviceProvider.GetRequiredService<IOpenIddictScopeManager>();
+
+    if (await scopeManager.FindByNameAsync("shop_api") is null)
+    {
+      await scopeManager.CreateAsync(new OpenIddictScopeDescriptor
+      {
+        // The name of the custom scope.
+        Name = "shop_api",
+        // The resource server associated with the scope.
+        Resources = {"shop-api"}
       });
     }
   }

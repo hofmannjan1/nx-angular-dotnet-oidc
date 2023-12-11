@@ -11,6 +11,6 @@ export const environment = {
   auth: {
     clientId: "shop",
     authorityUrl: "https://localhost:7001",
-    scopes: "openid profile email",
+    scopes: "openid profile email shop_api",
   },
 };

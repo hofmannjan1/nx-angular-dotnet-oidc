@@ -82,6 +82,8 @@ builder.Services
   {
     // Set the URL of the identity server that issues the tokens.
     options.SetIssuer("https://localhost:7001");
+    // Check if the audience of the issued token contains this resource server.
+    options.AddAudiences("shop-api");
 
     // Configure the validation handler to use introspection. It uses OpenID Connect discovery
     // (.well-known/openid-configuration) to retrieve the URL of the introspection endpoint.
@@ -96,13 +98,14 @@ builder.Services
     options.UseAspNetCore();
   });
 
-// For now, make OpenIddict's System.Net.Http integration ignore server certificate validation errors.
-// See https://stackoverflow.com/a/65618900
+// For now, make OpenIddict's System.Net.Http integration ignore server certificate validation
+// errors. See https://stackoverflow.com/a/65618900
 builder.Services
   .AddHttpClient(typeof(OpenIddictValidationSystemNetHttpOptions).Assembly.GetName().Name!)
   .ConfigurePrimaryHttpMessageHandler(_ => new HttpClientHandler
   {
-    ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+    ServerCertificateCustomValidationCallback = 
+      HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
   });
 
 builder.Services.AddAuthentication(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);

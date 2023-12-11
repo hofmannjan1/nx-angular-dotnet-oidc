@@ -15,12 +15,14 @@ public class TokenController : OpenIdController
 {
   private readonly SignInManager<AppUser> _signInManager;
   private readonly UserManager<AppUser> _userManager;
+  private readonly IOpenIddictScopeManager _scopeManager;
 
   public TokenController(SignInManager<AppUser> signInManager,
-    UserManager<AppUser> userManager)
+    UserManager<AppUser> userManager, IOpenIddictScopeManager scopeManager)
   {
     _signInManager = signInManager;
     _userManager = userManager;
+    _scopeManager = scopeManager;
   }
 
   [HttpPost("~/connect/token"), Produces("application/json")]
@@ -60,7 +62,7 @@ public class TokenController : OpenIdController
         }),
         OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
 
-    // Initialize claims identity
+    // Initialize claims identity.
     var identity = new ClaimsIdentity(
       result.Principal.Claims,
       TokenValidationParameters.DefaultAuthenticationType,
@@ -73,11 +75,15 @@ public class TokenController : OpenIdController
       .SetClaim(Claims.Email, await _userManager.GetEmailAsync(user))
       .SetClaim(Claims.Name, await _userManager.GetUserNameAsync(user));
 
+    // Grant all the requested scopes.
+    identity.SetScopes(request.GetScopes());
+
+    // Get the resource servers associated with the granted scopes and set them as audience.
+    identity.SetResources(await _scopeManager.ListResourcesAsync(identity.GetScopes()).ToListAsync());
+
     // Set destinations (access token, identity token or both) for the claims.
     identity.SetDestinations(ClaimsDestinationSelector);
 
     return SignIn(new ClaimsPrincipal(identity), OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
   }
-
-
 }
