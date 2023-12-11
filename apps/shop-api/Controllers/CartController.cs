@@ -65,7 +65,7 @@ public class CartController : ControllerBase
 
   [HttpPost("positions/order")]
   [ProducesResponseType(StatusCodes.Status200OK)]
-  public async Task<IActionResult> OrderCartPositionsAsync(OrderCartPositionsRequest request)
+  public async Task<IActionResult> OrderCartPositionsAsync(OrderCartPositionsRequest? request)
   {
     var userId = User.GetClaim(Claims.Subject)
       ?? throw new InvalidOperationException("Could not determine the user.");

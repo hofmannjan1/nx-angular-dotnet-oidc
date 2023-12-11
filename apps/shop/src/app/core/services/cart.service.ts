@@ -29,11 +29,6 @@ export class CartService {
     );
   };
 
-  orderCartPositions = (ids: number[]): Promise<any> => {
-    let params = new HttpParams().appendAll({ ids: ids });
-
-    return firstValueFrom(
-      this.httpClient.post(`${environment.shopApiUrl}/cart/positions/order?${params}`, {})
-    );
-  };
+  orderCart = (): Promise<any> =>
+    firstValueFrom(this.httpClient.post(`${environment.shopApiUrl}/cart/positions/order`, {}));
 }

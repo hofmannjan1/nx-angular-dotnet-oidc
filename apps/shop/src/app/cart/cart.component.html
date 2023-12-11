@@ -1,9 +1,7 @@
 <h1 class="mb-3">Cart</h1>
-@if (positionsLoading()) {
-  <div class="spinner-border">
-    <span class="visually-hidden">Loading...</span>
-  </div>
-} @else {
+
+@if (viewModel(); as vm) {
+  <!-- Cart positions -->
   <table class="table table-hover">
     <thead>
       <tr>
@@ -14,14 +12,14 @@
       </tr>
     </thead>
     <tbody>
-      @for (position of positionsWithProducts(); track position.id) {
+      @for (position of vm.positionsWithProducts; track position.id) {
         <tr>
           <th>{{ $index + 1 }}</th>
           <td>{{ position.product.name }}</td>
           <td>{{ position.quantity }}</td>
           <td class="pe-1 text-end">
             <button
-              (click)="deletePosition(position.id)"
+              (click)="deletePositions([position.id])"
               type="button"
               class="btn btn-sm btn-outline-danger">
               Delete
@@ -31,41 +29,53 @@
       }
     </tbody>
   </table>
-}
-@if (positionCount() > 0) {
-  <div class="pe-1 text-end">
-    <button
-      (click)="orderAllPositions()"
-      type="button"
-      class="btn btn-primary">
-      Order
-    </button>
-  </div>
-}
 
-<!-- Order confirmation modal -->
-<ng-template
-  #confirm
-  let-modal>
-  <div class="modal-header">
-    <h4
-      class="modal-title"
-      id="modal-basic-title">
-      Confirm
-    </h4>
-    <button
-      type="button"
-      class="btn-close"
-      aria-label="Close"
-      (click)="modal.dismiss()"></button>
+  <!-- Cart actions -->
+  @if (vm.positionCount > 0) {
+    <div class="pe-1 text-end">
+      <button
+        (click)="deletePositions(vm.positionIds)"
+        type="button"
+        class="btn btn-outline-danger me-3">
+        Clear
+      </button>
+      <button
+        (click)="order()"
+        type="button"
+        class="btn btn-primary">
+        Order
+      </button>
+    </div>
+  }
+
+  <!-- Order confirmation modal -->
+  <ng-template
+    #confirm
+    let-modal>
+    <div class="modal-header">
+      <h4
+        class="modal-title"
+        id="modal-basic-title">
+        Please confirm
+      </h4>
+      <button
+        type="button"
+        class="btn-close"
+        aria-label="Close"
+        (click)="modal.dismiss()"></button>
+    </div>
+    <div class="modal-body">
+      <p>Do you want to order {{ vm.productCount }} products?</p>
+      <button
+        type="button"
+        class="btn btn-primary"
+        (click)="modal.close()">
+        Confirm
+      </button>
+    </div>
+  </ng-template>
+} @else {
+  <div class="spinner-border">
+    <span class="visually-hidden">Loading...</span>
   </div>
-  <div class="modal-body">
-    <p>Do you want to order {{ positionCount() }} cart positions?</p>
-    <button
-      type="button"
-      class="btn btn-outline-dark"
-      (click)="modal.close()">
-      Confirm
-    </button>
-  </div>
-</ng-template>
+}

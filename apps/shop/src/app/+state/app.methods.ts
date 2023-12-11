@@ -50,8 +50,8 @@ export function withAppMethods() {
           await cartService.deleteCartPosition(ids);
           this.loadCartPositions();
         },
-        async orderCartPositions(ids: number[]): Promise<void> {
-          await cartService.orderCartPositions(ids);
+        async orderCart(): Promise<void> {
+          await cartService.orderCart();
           this.loadCartPositions();
           this.loadOrders();
         },
