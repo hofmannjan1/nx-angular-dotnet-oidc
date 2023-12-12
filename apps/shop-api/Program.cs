@@ -122,7 +122,11 @@ if (app.Environment.IsDevelopment())
   // Enable the middleware for serving the Swagger generated JSON document and Swagger UI.
   // See https://aka.ms/aspnetcore/swashbuckle
   app.UseSwagger();
-  app.UseSwaggerUI();
+  app.UseSwaggerUI(options =>
+  {
+    // Keep authorization token in browser refresh.
+    options.ConfigObject.AdditionalItems.Add("persistAuthorization", "true");
+  });
 }
 
 // Configure CORS.
