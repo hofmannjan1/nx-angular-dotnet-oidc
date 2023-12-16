@@ -32,8 +32,6 @@ export class AppComponent {
     this.oidcSecurityService
       .checkAuth()
       .subscribe(({ isAuthenticated, userData }) => console.log(isAuthenticated, userData));
-
-    this.appStore.loadProducts();
   }
 
   login(): void {

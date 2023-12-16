@@ -35,7 +35,7 @@ export class CartComponent {
     productCount: Object.values(this.appStore.cartPositions()).reduce(
       (acc, x) => acc + x.quantity,
       0
-    )
+    ),
   }));
 
   deletePositions(ids: number[]): void {

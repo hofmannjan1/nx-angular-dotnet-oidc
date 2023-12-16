@@ -1,9 +1,12 @@
+/*
+ * ABOUT THIS FILE
+ *
+ * This files provides an utility function to turn any array into a record by providing a key
+ * selector function.
+ */
 type KeySelectorFn<T> = (t: T) => string | number | symbol;
 type KeySelector<T> = KeySelectorFn<T> | keyof T;
 
-/**
- * Create record from an array and a key selector.
- */
 export function createRecord<TKey extends string | number | symbol, TValue>(
   array: TValue[] | undefined,
   keySelector: KeySelector<TValue>

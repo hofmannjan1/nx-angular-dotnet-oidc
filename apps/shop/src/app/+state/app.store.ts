@@ -9,10 +9,13 @@
  * a convention that keeps the store-related files at the top of the file tree. Inital impulse from
  * https://github.com/angular-architects.
  */
-import { signalStore, withState } from "@ngrx/signals";
+import { signalStore, withHooks, withState } from "@ngrx/signals";
 import { CartPosition, Order, Product } from "../core/models";
 import { withAppComputed } from "./app.computed";
 import { withAppMethods } from "./app.methods";
+import { inject } from "@angular/core";
+import { OidcSecurityService } from "angular-auth-oidc-client";
+import { tap } from "rxjs";
 
 export type AppState = {
   products: Record<number, Product>;
@@ -39,5 +42,10 @@ export const AppStore = signalStore(
   // Add computed signals via the custom store feature.
   withAppComputed(),
   // Add methods via the custom store feature.
-  withAppMethods()
+  withAppMethods(),
+  withHooks({
+    onInit({ loadProducts }) {
+      loadProducts();
+    },
+  })
 );

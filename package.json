@@ -1,6 +1,6 @@
 {
   "name": "nx-angular-dotnet-oidc",
-  "version": "0.3.15",
+  "version": "0.3.16",
   "license": "MIT",
   "scripts": {
     "format": "prettier --write apps/shop",
@@ -41,7 +41,6 @@
     "@angular/core": "~17.0.0",
     "@angular/forms": "~17.0.0",
     "@angular/platform-browser": "~17.0.0",
-    "@angular/platform-browser-dynamic": "~17.0.0",
     "@angular/router": "~17.0.0",
     "@ng-bootstrap/ng-bootstrap": "^16.0.0",
     "@ngrx/signals": "^17.0.1",

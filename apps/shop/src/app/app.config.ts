@@ -1,9 +1,10 @@
 /*
  * ABOUT THIS FILE
  *
- * This files includes the initial application configuration. This is a lightweight alternative to
- * the app.module.ts file which would be used for an Angular application without standalone
- * components.
+ * This file contains the application's config with a list of providers that should be available in
+ * the application injector. The application's config is then passed to the `bootstrapApplication`
+ * function. Prior to standalone components, providers would have specified in an app.module.ts,
+ * which would have been passed to the `bootstrapModule` function.
  */
 import { ApplicationConfig } from "@angular/core";
 import { provideRouter } from "@angular/router";
