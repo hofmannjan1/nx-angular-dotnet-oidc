@@ -72,7 +72,7 @@ public class CartController : ControllerBase
 
     // A unit of work executes all commands between `BeginAsync()` and `CommitAsync()` in a single
     // transaction.
-    using var unitOfWork = _appDbContextFactory.CreateUnitOfWork();
+    await using var unitOfWork = _appDbContextFactory.CreateUnitOfWork();
 
     try
     {

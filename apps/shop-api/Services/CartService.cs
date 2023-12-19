@@ -25,7 +25,7 @@ public interface ICartService
   Task<int> UpsertCartPositionAsync(string userId, int productId, int? quantity,
     CancellationToken cancellationToken);
 
-  Task DeleteCartPositionsAsync(string userId, IEnumerable<int> ids,
+  Task DeleteCartPositionsAsync(string userId, IEnumerable<int>? ids,
     CancellationToken cancellationToken);
 
   Task<IEnumerable<int>> CreateOrderPositionsFromCartPositionsAsync(string userId, int orderId,
@@ -45,7 +45,7 @@ public class CartService : ICartService
   public async Task<IEnumerable<CartPosition>> GetCartPositionsAsync(string userId,
     IEnumerable<int>? ids, CancellationToken cancellationToken)
   {
-    using var context = _appDbContextFactory.CreateContext();
+    await using var context = _appDbContextFactory.CreateContext();
 
     var sql = $@"
       SELECT Id, UserId, ProductId, Quantity
@@ -67,7 +67,7 @@ public class CartService : ICartService
   public async Task<int> UpsertCartPositionAsync(string userId, int productId, int? quantity,
     CancellationToken cancellationToken)
   {
-    using var context = _appDbContextFactory.CreateContext();
+    await using var context = _appDbContextFactory.CreateContext();
 
     const string sql = @"
       INSERT INTO Cart(UserId, ProductId, Quantity)
@@ -87,14 +87,14 @@ public class CartService : ICartService
   /// <summary>
   /// Delete cart positions by IDs.
   /// </summary>
-  public async Task DeleteCartPositionsAsync(string userId, IEnumerable<int> ids,
+  public async Task DeleteCartPositionsAsync(string userId, IEnumerable<int>? ids,
     CancellationToken cancellationToken)
   {
-    using var context = _appDbContextFactory.CreateContext();
+    await using var context = _appDbContextFactory.CreateContext();
 
-    const string sql = @"
+    var sql = $@"
       DELETE FROM Cart
-      WHERE UserId = @UserId AND Id IN @Ids";
+      WHERE UserId = @UserId {(!ids.IsNullOrEmpty() ? "AND Id IN @Ids" : "")}";
 
     await context.Connection.ExecuteAsync(new CommandDefinition(sql, new
     {
@@ -106,7 +106,7 @@ public class CartService : ICartService
   public async Task<IEnumerable<int>> CreateOrderPositionsFromCartPositionsAsync(string userId,
     int orderId, IEnumerable<int>? ids, CancellationToken cancellationToken)
   {
-    using var context = _appDbContextFactory.CreateContext();
+    await using var context = _appDbContextFactory.CreateContext();
 
     var sql = $@"
       INSERT INTO OrderPosition (OrderId, ProductId, Quantity, Price)

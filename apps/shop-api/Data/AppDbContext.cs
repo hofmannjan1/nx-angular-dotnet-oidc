@@ -9,41 +9,45 @@
  * used outside an unit of work, it is disposed on its own.
  *
  * Inspired by https://nathancooper.dev/articles/2020-03/unit-of-work-pattern
+ * See https://github.com/hofmannjan1/dapper-unit-of-work
  */
-using Microsoft.Data.Sqlite;
+using System.Data.Common;
 
 namespace ShopApi.Data;
 
-public interface IAppDbContext : IDisposable
+public interface IAppDbContext : IAsyncDisposable
 {
-  public SqliteConnection Connection { get; }
-  public SqliteTransaction? Transaction { get; set; }
+  public DbConnection Connection { get; }
+  public DbTransaction? Transaction { get; set; }
+  bool IsDisposed { get; set; }
 }
 
 public class AppDbContext : IAppDbContext
 {
-  public SqliteConnection Connection { get; }
-  public SqliteTransaction? Transaction { get; set; }
+  public DbConnection Connection { get; }
+  public DbTransaction? Transaction { get; set; }
   public bool IsDisposed { get; set; }
 
   private readonly bool _isUnitOfWorkContext;
 
-  public AppDbContext(string connectionString, bool isUnitOfWorkContext = false)
+  public AppDbContext(DbConnection connection, bool isUnitOfWorkContext = false)
   {
-    Connection = new SqliteConnection(connectionString);
+    Connection = connection;
     Connection.Open();
 
     _isUnitOfWorkContext = isUnitOfWorkContext;
   }
-
-  public void Dispose()
+  
+  public async ValueTask DisposeAsync()
   {
     // If there is an unit of work, let it take care of the disposal of the transaction/connection.
     if (_isUnitOfWorkContext)
       return;
+    
+    await Connection.DisposeAsync();
+    if (Transaction is not null) 
+      await Transaction.DisposeAsync();
 
-    Transaction?.Dispose();
-    Connection?.Dispose();
     IsDisposed = true;
   }
 }

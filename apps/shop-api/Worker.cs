@@ -1,4 +1,5 @@
 using Dapper;
+using Microsoft.Data.SqlClient;
 using ShopApi.Data;
 
 namespace ShopApi;
@@ -6,11 +7,23 @@ namespace ShopApi;
 public class Worker : IHostedService
 {
   private readonly IServiceProvider _serviceProvider;
+  private readonly IConfiguration _configuration;
 
-  public Worker(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
+  public Worker(IServiceProvider serviceProvider, IConfiguration configuration)
+  {
+    _serviceProvider = serviceProvider;
+    _configuration = configuration;
+  }
 
   public async Task StartAsync(CancellationToken cancellationToken)
   {
+    // Create directory if it does not exist.
+    var connString = new SqlConnectionStringBuilder(_configuration.GetConnectionString("Sqlite"));
+    var directory = Path.GetDirectoryName(connString["Data Source"] as string);
+
+    if (directory is not null & !File.Exists(directory))
+      Directory.CreateDirectory(directory!);
+    
     await using var scope = _serviceProvider.CreateAsyncScope();
 
     // Seed the database.
@@ -27,7 +40,7 @@ public class Worker : IHostedService
   {
     var factory = serviceProvider.GetRequiredService<IAppDbContextFactory>();
 
-    using var context = factory.CreateContext();
+    await using var context = factory.CreateContext();
 
     const string sql = @"
       CREATE TABLE IF NOT EXISTS
@@ -72,7 +85,7 @@ public class Worker : IHostedService
   {
     var factory = serviceProvider.GetRequiredService<IAppDbContextFactory>();
 
-    using var context = factory.CreateContext();
+    await using var context = factory.CreateContext();
 
     const string sql = @"
       INSERT OR IGNORE INTO Product([Name], Price, AlcoholByVolume)

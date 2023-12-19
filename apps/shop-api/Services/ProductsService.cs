@@ -17,7 +17,7 @@ public class ProductsService : IProductsService
 
   public async Task<IEnumerable<Product>> GetProductsAsync(CancellationToken cancellationToken)
   {
-    using var context = _appDbContextFactory.CreateContext();
+    await using var context = _appDbContextFactory.CreateContext();
 
     const string sql = @"
       SELECT Id, Name, Price, AlcoholByVolume

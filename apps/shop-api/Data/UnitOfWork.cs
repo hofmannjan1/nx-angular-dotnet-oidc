@@ -7,12 +7,13 @@
  * the changes and end the unit of work.
  *
  * Inspired by https://nathancooper.dev/articles/2020-03/unit-of-work-pattern
+ * See https://github.com/hofmannjan1/dapper-unit-of-work
  */
-using Microsoft.Data.Sqlite;
+using System.Data.Common;
 
 namespace ShopApi.Data;
 
-public interface IUnitOfWork : IDisposable
+public interface IUnitOfWork : IAsyncDisposable
 {
   AppDbContext Context { get; }
   bool IsDisposed { get; }
@@ -26,19 +27,21 @@ public class UnitOfWork : IUnitOfWork
   public AppDbContext Context { get; }
   public bool IsDisposed => Context.IsDisposed;
 
-  public UnitOfWork(string connectionString) => Context = new AppDbContext(connectionString, true);
+  public UnitOfWork(DbConnection connection) => Context = new AppDbContext(connection, true);
 
   public async Task BeginAsync() =>
-    Context.Transaction = await Context.Connection.BeginTransactionAsync() as SqliteTransaction;
+    Context.Transaction = await Context.Connection.BeginTransactionAsync();
 
   public async Task RollbackAsync() => await Context.Transaction!.RollbackAsync();
 
   public async Task CommitAsync() => await Context.Transaction!.CommitAsync();
-
-  public void Dispose()
+  
+  public async ValueTask DisposeAsync()
   {
-    Context.Connection?.Dispose();
-    Context.Transaction?.Dispose();
-    Context.IsDisposed = true;
+    await Context.Connection.DisposeAsync();
+        if (Context.Transaction is not null) 
+          await Context.Transaction.DisposeAsync();
+    
+        Context.IsDisposed = true;
   }
 }

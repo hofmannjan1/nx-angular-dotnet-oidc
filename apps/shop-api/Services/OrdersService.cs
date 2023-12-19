@@ -20,7 +20,7 @@ public class OrdersService : IOrdersService
   public async Task<IEnumerable<Order>> GetOrdersAsync(string userId,
     CancellationToken cancellationToken)
   {
-    using var context = _appDbContextFactory.CreateContext();
+    await using var context = _appDbContextFactory.CreateContext();
 
     const string sql = @"
       SELECT Id, UserId, [DateTime], ROUND((
@@ -37,7 +37,7 @@ public class OrdersService : IOrdersService
 
   public async Task<int> CreateEmptyOrderAsync(string userId, CancellationToken cancellationToken)
   {
-    using var context = _appDbContextFactory.CreateContext();
+    await using var context = _appDbContextFactory.CreateContext();
 
     const string sql = @"
       INSERT INTO [Order] (UserId, [DateTime])

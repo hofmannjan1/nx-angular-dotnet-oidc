@@ -7,7 +7,10 @@
  * including the transaction. Otherwise, it will return a new database context without transaction.
  *
  * Inspired by https://nathancooper.dev/articles/2020-03/unit-of-work-pattern
+ * See https://github.com/hofmannjan1/dapper-unit-of-work
  */
+using Microsoft.Data.Sqlite;
+
 namespace ShopApi.Data;
 
 public interface IAppDbContextFactory
@@ -18,22 +21,16 @@ public interface IAppDbContextFactory
 
 public class AppDbContextFactory : IAppDbContextFactory
 {
-  private readonly string _connectionString;
+  private readonly string? _connectionString;
   private IUnitOfWork? _unitOfWork;
 
   private bool IsUnitOfWorkActive => _unitOfWork is not null && !_unitOfWork.IsDisposed;
 
-  public AppDbContextFactory()
-  {
-    var tempPath = Path.Combine(Path.GetTempPath(), "nx-angular-dotnet-oidc");
-    if (!File.Exists(tempPath))
-      Directory.CreateDirectory(tempPath);
-
-    _connectionString = $"Filename={Path.Combine(tempPath, "shop-api.sqlite3")}";
-  }
+  public AppDbContextFactory(IConfiguration configuration) => 
+    _connectionString = configuration.GetConnectionString("Sqlite");
 
   public IAppDbContext CreateContext() =>
-    IsUnitOfWorkActive ? _unitOfWork!.Context : new AppDbContext(_connectionString);
+    IsUnitOfWorkActive ? _unitOfWork!.Context : new AppDbContext(new SqliteConnection(_connectionString));
 
   public IUnitOfWork CreateUnitOfWork()
   {
@@ -41,6 +38,6 @@ public class AppDbContextFactory : IAppDbContextFactory
       throw new InvalidOperationException(
         "Could not begin a unit of work because there already exist an active unit of work.");
 
-    return _unitOfWork = new UnitOfWork(_connectionString);
+    return _unitOfWork = new UnitOfWork(new SqliteConnection(_connectionString));
   }
 }
