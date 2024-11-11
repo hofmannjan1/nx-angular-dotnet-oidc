@@ -3,6 +3,7 @@
   "version": "0.3.17",
   "license": "MIT",
   "scripts": {
+    "start": "npx nx run-many --target=serve --all",
     "format": "prettier --write apps/shop",
     "prepare": "nx g @nx-dotnet/core:restore"
   },
